@@ -1,0 +1,78 @@
+{% extends 'admin_template/base_template.html' %}
+{% block page_title %}
+Add Vendor
+{% endblock page_title %}
+{% block main_content %}
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-dark">
+                      <div class="card-header">
+                        <h3 class="card-title">Add Vendor</h3>
+                      </div>
+                      <!-- /.card-header -->
+                      <!-- form start -->
+                      <form role="form" action="/add_vendor_save" method="POST">
+                          {% csrf_token %}
+                        <div class="card-body">
+                          <div class="form-group">
+                            <label>Email address</label>
+                            <input type="email" class="form-control" name="email" id="id_email" placeholder="Enter email" autocomplete="off">
+                          </div>
+                          <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Password">
+                          </div>       
+                          <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" class="form-control" name="first_name" placeholder="First Name">
+                          </div>
+                          <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" class="form-control" name="last_name" placeholder="Last Name">
+                          </div>
+                          <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" name="username" id="id_username" placeholder="Username" autocomplete="off">
+                          </div>
+                          <div class="form-group">
+                            <label>Shop Name</label>
+                            <input type="text" class="form-control" name="shop_name" placeholder="Shop Name">
+                          </div>
+                          <div class="form-group">
+                            <label>Place</label>
+                            <input type="text" class="form-control" name="place" placeholder="Place">
+                          </div>
+                       
+                          
+                        <div class="card-footer">
+                          <button type="submit" class="btn btn-outline-primary btn-block">Add Vendor</button>
+                        </div>
+                        <div class="form-group">
+                            {% if messages %}
+                               {% for message in messages %}
+                               {% if message.tags == 'error' %} 
+                                <div class="alert alert-danger" style="margin-top: 10px;">{{ message }}</div>
+                                {% endif %} 
+                                {% if message.tags == 'success' %} 
+                                <div class="alert alert-success" style="margin-top: 10px;">{{ message }}</div>
+                                {% endif %} 
+                                {% endfor %}
+                              </div>
+                            {% endif %}
+                      </form>
+                    </div>
+                    <!-- /.card -->
+        
+        
+                  </div>
+            </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+{% endblock main_content %}
+

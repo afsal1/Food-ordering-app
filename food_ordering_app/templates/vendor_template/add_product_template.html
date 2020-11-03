@@ -1,0 +1,244 @@
+{% extends 'vendor_template/base_template.html' %}
+{% block page_title %}
+Add Product
+{% endblock page_title %}
+{% block custom_css %}
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!-- <script src="https://kit.fontawesome.com/c0d12c7483.js" crossorigin="anonymous"></script> -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<!-- <link href="css/fineCrop.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css">
+
+<style>
+
+    .page {
+        margin: 1em auto;
+        max-width: 768px;
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        height: 100%;
+    }
+    
+    .box {
+        padding: 0.5em;
+        width: 100%;
+        margin:0.5em;
+    }
+    
+    .box-2 {
+        padding: 0.5em;
+        width: calc(100%/2 - 1em);
+    }
+    
+    .options label,
+    .options input{
+        width:4em;
+        padding:0.5em 1em;
+    }
+    .btn{
+        background:white;
+        color:black;
+        border:1px solid black;
+        padding: 0.5em 1em;
+        text-decoration:none;
+        margin:0.8em 0.3em;
+        display:inline-block;
+        cursor:pointer;
+    }
+    
+    .hide {
+        display: none;
+    }
+    
+    img {
+        max-width: 100%;
+    }
+    
+    </style>
+{% endblock custom_css %}
+{% block main_content %}
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-dark">
+                      <div class="card-header">
+                        <h3 class="card-title">Add Product</h3>
+                      </div>
+                      <!-- /.card-header -->
+                      <!-- form start -->
+                      <form role="form" action="add_product_save" method="POST">
+                          {% csrf_token %}
+                        <div class="card-body">
+                          <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" class="form-control" name="product_name" id="id_product" placeholder="Enter Product Name" autocomplete="off">
+                          </div>
+                          <div class="form-group">
+                            <label>Category</label>
+                            <select class="form-control" name="category_name">
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                    {% endfor %}
+
+                            </select>
+                          </div>      
+                          <div class="form-group">
+                            <label>Price</label>
+                            <input type="text" class="form-control" name="price" placeholder="Price">
+                          </div>
+                          <div class="form-group">
+                            <label>Quantity</label>
+                            <input type="text" class="form-control" name="quantity" placeholder="Quantity">
+                          </div>
+                          <div class="control-group">
+                            <label class="control-label" for="photo"></label>
+                            <div class="controls">
+                                <input required = True id="imageBaseData" class="hidden" name="image64data" class="input-file" type="text" >
+        
+                                <main class="page">
+                                    <label class="control-label" for="full_name">Product Photo</label>
+                                    <!-- input file -->
+                                    <div class="box">
+                                        <input  type="file" id="file-input">
+                                    </div>
+                                    <!-- leftbox -->
+                                    <div class="box-2">
+                                        <div class="result"></div>
+                                    </div>
+                                    <!--rightbox-->
+                                    <div class="box-2 img-result hide">
+                                        <!-- result of crop -->
+                                        <img id="cropped" class="cropped"  src="" alt="">
+                                    </div>
+                                    <!-- input file -->
+                                    <div class="box">
+                                        <div class="options hide">
+                                            <label> </label>
+                                            <input type="hidden" name="myfile" class="img-w" value="300" min="100" max="1200" />
+                                        </div>
+                                        <!-- save btn -->
+                                        <button id="load" class="btn save hide">Confirm</button>
+                                        <!-- download btn -->
+                                        <a href="" id="" class="btn hidden"></a>
+                                        <!-- <button  id="load" class="  btn btn primary" type="button" >Upload</button> -->
+                                    </div>
+                                </main>
+                              </div>
+                            </div>
+                        <div class="card-footer">
+                          <button type="submit" class="btn btn-primary btn-block">Add Product</button>
+                        </div>
+                        <div class="form-group">
+                            {% if messages %}
+                               {% for message in messages %}
+                               {% if message.tags == 'error' %} 
+                                <div class="alert alert-danger" style="margin-top: 10px;">{{ message }}</div>
+                                {% endif %} 
+                                {% if message.tags == 'success' %} 
+                                <div class="alert alert-success" style="margin-top: 10px;">{{ message }}</div>
+                                {% endif %} 
+                                {% endfor %}
+                              </div>
+                            {% endif %}
+                      </form>
+                    </div>
+                    <!-- /.card -->
+        
+        
+                  </div>
+            </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+{% endblock main_content %}
+{% block custom_js %}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
+
+
+  <script>
+    // vars
+    let result = document.querySelector('.result'),
+    img_result = document.querySelector('.img-result'),
+    img_w = document.querySelector('.img-w'),
+    img_h = document.querySelector('.img-h'),
+    options = document.querySelector('.options'),
+    save = document.querySelector('.save'),
+    cropped = document.querySelector('.cropped'),
+    dwn = document.querySelector('.download'),
+    upload = document.querySelector('#file-input'),
+    cropper = '';
+
+    // on change show image with crop options
+    upload.addEventListener('change', (e) => {
+    if (e.target.files.length) {
+            // start file reader
+        const reader = new FileReader();
+        reader.onload = (e)=> {
+        if(e.target.result){
+                    // create new image
+                    let img = document.createElement('img');
+                    img.id = 'image';
+                    img.src = e.target.result
+                    // clean result before
+                    result.innerHTML = '';
+                    // append new image
+            result.appendChild(img);
+                    // show save btn and options
+                    save.classList.remove('hide');
+                    options.classList.remove('hide');
+                    // init cropper
+                    cropper = new Cropper(img);
+        }
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+    });
+
+    // save on click
+    save.addEventListener('click',(e)=>{
+    e.preventDefault();
+    // get result to data uri
+    let imgSrc = cropper.getCroppedCanvas({
+            width: img_w.value // input value
+        }).toDataURL();
+    // remove hide class of img
+    cropped.classList.remove('hide');
+        img_result.classList.remove('hide');
+        // show image cropped
+    cropped.src = imgSrc;
+    dwn.classList.remove('hide');
+    dwn.download = 'imagename.png';
+    dwn.setAttribute('href',imgSrc);
+
+    });
+
+</script>
+
+<script>
+    var button = document.getElementById('load');
+    button.addEventListener('click',function(){
+        setImageData();
+        console.log('Cropped')
+    })
+    
+
+    function setImageData(){
+        
+        var imageElement = document.getElementById('cropped');
+        var imageData = imageElement.src;
+        var hiddenElement = document.getElementById("imageBaseData");
+        hiddenElement.value = imageData;
+        console.log("data set")
+    }
+</script>
+{% endblock custom_js %}

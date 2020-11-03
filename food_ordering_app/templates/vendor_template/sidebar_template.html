@@ -1,0 +1,68 @@
+{% load static %}
+<aside class="main-sidebar sidebar-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="index3.html" class="brand-link">
+      <img src="{% static 'images/chef.png' %}" alt="AdminLTE Logo"  class="brand-image img-circle "
+           style="height: 50px;width: 50px;opacity: .8;">
+      <span class="brand-text font-weight-light" style="font-family: Cambria;">Home Chef</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="{% static 'dist/img/user8-128x128.jpg' %}" class="img-circle" style="height: 50px;width: 50px;" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="{% url 'vendor_profile' %}" class="d-block">{{ user.username }}</a>
+        </div>
+      </div>
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+               <li class="nav-item">
+                <a href="" class="nav-link ">
+                  <i class="nav-icon fas fa-home"></i>
+                  <p>
+                    Vendor Home
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'manage_product' %}" class="nav-link ">
+              <i class="nav-icon fas fa-user"></i>
+              <p>
+                Product Management
+              </p>
+            </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'manage_offer' %}" class="nav-link ">
+            <i class="nav-icon fas fa-user"></i>
+            <p>
+             Offers
+            </p>
+          </a>
+      </li>
+        <li class="nav-item">
+            <a href="{% url 'manage_order' %}" class="nav-link ">
+              <i class="nav-icon fas fa-tasks"></i>
+              <p>
+                Order Management
+              </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'order_history' %}" class="nav-link ">
+              <i class="nav-icon fas fa-people-carry"></i>
+              <p>
+                Order History
+              </p>
+            </a>
+        </li>
+        </ul>
+    
+    
+    </div>
+  
+  </aside>

@@ -1,0 +1,70 @@
+{% extends 'vendor_template/base_template.html' %}
+{% block page_title %}
+Manage Offer
+{% endblock page_title %}
+{% block main_content %}
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-4 pb-5">
+              <a href="{% url 'add_offer' %}" class="btn btn-outline-primary ">+Add Offer</a></td>
+            </div>
+          </div>
+            <div class="row">
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Offer Details</h3>
+      
+                      <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                          <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+      
+                          <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                      <table class="table table-hover text-nowrap">
+                        <thead>
+                          <tr>
+                            <th>Product Name</th>
+                            <th>Offer Percentage</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for offer in offers %}
+                          <tr>
+                            <td>{{ offer.product.product_name }}</td>
+                            <td>{{ offer.offer }}</td>
+                            <td><a href="/edit_offer/{{ offer.id }}" class="btn btn-outline-info ">Edit</a>
+                              <a class="confirm-delete btn btn-outline-danger" href="/delete_offer/{{ offer.id }}" >Delete</a>
+                              {% block custom_js %}
+                              <script>
+                                  $(document).on('click', '.confirm-delete', function(){
+                                      return confirm('Are you sure you want to delete this?');
+                                  })
+                                </script>
+                              {% endblock custom_js %}
+
+          
+                            
+                             </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                  <!-- /.card -->
+                </div>
+              </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+{% endblock main_content %}
