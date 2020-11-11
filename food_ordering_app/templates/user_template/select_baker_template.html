@@ -1,0 +1,33 @@
+{% extends 'user_template/base_template.html' %}
+{% block page_title %}
+
+{% endblock page_title %}
+{% block main_content %}
+{% block custom_css %}
+<section class="services py-5" id="services">
+    <div class="container py-md-5">
+        <div class="header pb-lg-3 pb-3 text-center">
+            <h3 class="tittle two mb-lg-3 mb-3 pt-5">Our Bakers</h3>
+        </div>
+        <div class="row">
+        {% for vendor in vendors %}
+        <div class=" ab-info  pb-5 pl-5">
+            <div class="ab-content">
+                <div class="ab-content-inner">
+                   <img src="{{ vendor.imageURL }}" alt="news image" class="img-fluid">
+                    <div class="ab-info-con">
+                        <h4>{{ vendor.shop_name }}</h4>
+                        <h4>{{ vendor.place }}</h4>
+                        <a href="/store" class="btn btn-dark ">Select</a>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    {% endfor %}
+</div>
+
+</div>
+</section>
+{% endblock custom_css %}
+ 
+{% endblock main_content %}

@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import user_passes_test
-from food_ordering_app.models import Vendor, Category, Product, Offer, CustomUser
+from food_ordering_app.models import Vendor, Category, Product, Offer, CustomUser, OrderDetails
 from django.urls import reverse 
 import base64
 from PIL import Image
@@ -51,8 +51,8 @@ def logout_vendor(request):
 
 def manage_product(request):
 
-    vendor=Vendor.objects.get(admin=request.user.id)
-    product=Product.objects.filter(vendor_id=vendor)
+    vendor = Vendor.objects.get(admin = request.user.id)
+    product = Product.objects.filter(vendor_id = vendor)
     return render(request, "vendor_template/manage_product_template.html",{"products":product})
 
 
@@ -158,13 +158,22 @@ def add_offer_save(request):
         offer_name=request.POST.get("offer_name")
         product_id=request.POST.get("product_name")
         product_name=Product.objects.get(id=product_id)
-        vendor_id=Vendor.objects.get(admin=request.user.id)
+        vendor = Vendor.objects.get(admin=request.user.id)
 
+        check_exist = Offer.objects.filter(product=product_name, vendor_id=vendor).exists()
+        if check_exist:
+            offer = Offer.objects.get(product=product_name,vendor_id=vendor)
+            offer.offer = offer_name
+            offer.save()
+            messages.success(request,"Successfully Added Offer")
+            return HttpResponseRedirect(reverse("add_offer"))
 
-        offer = Offer(offer=offer_name,product=product_name,vendor_id=vendor_id)
-        offer.save()
-        messages.success(request,"Successfully Added Offer")
-        return HttpResponseRedirect(reverse("add_offer"))
+        else:
+
+            offer = Offer(offer=offer_name,product=product_name,vendor_id=vendor)
+            offer.save()
+            messages.success(request,"Successfully Added Offer")
+            return HttpResponseRedirect(reverse("add_offer"))
 
 
 def edit_offer(request,offer_id):
@@ -202,6 +211,28 @@ def delete_offer(request,offer_id):
     offer.delete()
     return redirect("manage_offer")
 
+
+
+def manage_vendor_order(request):
+    orders = OrderDetails.objects.all()
+    # print(orders[0].customer)
+    context = {
+        "orders":orders,
+    }
+
+    return render(request,"vendor_template/vendor_status_template.html",context)
+
+
+def update_order(request):
+    id = request.POST.get('order_id')
+    status = request.POST.get('order_status')
+    print(status)
+
+    order = OrderDetails.objects.get(id = id)
+    order.order_status = status
+    order.save()
+
+    return redirect('manage_vendor_order')
 
 
 def manage_order(request):

@@ -67,7 +67,7 @@ Add Product
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-12">
                     <!-- general form elements -->
                     <div class="card card-dark">
                       <div class="card-header">
@@ -75,13 +75,19 @@ Add Product
                       </div>
                       <!-- /.card-header -->
                       <!-- form start -->
+
                       <form role="form" action="add_product_save" method="POST">
                           {% csrf_token %}
                         <div class="card-body">
+                          <div class="row">
+                          <div class="col-6 pl-5">
+
                           <div class="form-group">
                             <label>Product Name</label>
                             <input type="text" class="form-control" name="product_name" id="id_product" placeholder="Enter Product Name" autocomplete="off">
                           </div>
+                        </div>
+                        <div class="col-6">
                           <div class="form-group">
                             <label>Category</label>
                             <select class="form-control" name="category_name">
@@ -90,15 +96,26 @@ Add Product
                                     {% endfor %}
 
                             </select>
-                          </div>      
+                          
+                            </div>
+                          </div>    
+                        </div>  
+                        <div class="row">
+                          <div class="col-6 pl-5">
                           <div class="form-group">
-                            <label>Price</label>
-                            <input type="text" class="form-control" name="price" placeholder="Price">
+                                <label>Price</label>
+                                <input type="text" class="form-control" name="price" placeholder="Price">
+                              </div>
                           </div>
-                          <div class="form-group">
-                            <label>Quantity</label>
-                            <input type="text" class="form-control" name="quantity" placeholder="Quantity">
-                          </div>
+                          <div class="col-6 ">
+                            <div class="form-group">
+                              <label>Quantity</label>
+                              <input type="text" class="form-control" name="quantity" placeholder="Quantity">
+                            </div>
+                           </div>
+                        </div>
+                      </div>
+
                           <div class="control-group">
                             <label class="control-label" for="photo"></label>
                             <div class="controls">
@@ -117,7 +134,7 @@ Add Product
                                     <!--rightbox-->
                                     <div class="box-2 img-result hide">
                                         <!-- result of crop -->
-                                        <img id="cropped" class="cropped"  src="" alt="">
+                                        <img id="cropped" class="cropped"  src="" alt=""></img>
                                     </div>
                                     <!-- input file -->
                                     <div class="box">

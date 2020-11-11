@@ -35,6 +35,7 @@ STATIC_URL="/static/"
 STATIC_ROOT=os.path.join(BASE_DIR,"static")
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -83,8 +84,14 @@ WSGI_APPLICATION = 'food_ordering_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite10',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite11',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME' : 'food_ordering_system',
+        'USER' : 'root',
+        'PASSWORD' : '12345',
+        'HOST' : 'localhost',
+        'PORT' : '3306',
     }
 }
 

@@ -23,15 +23,15 @@ def do_login(request):
                     print("login")
             else:
                 messages.error(request,"Inavalid login details")
-                return redirect("/")
+                return redirect("show_login_page")
                 print("not login")
         except:
             messages.error(request,"Inavalid login details")
-            return redirect("/")
+            return redirect("show_login_page")
             print(" not  h login")
 
     else:
-        return render(request,"admin_template/login_page.html")
+        return render(request,"templates/login_page.html")
 
 
 def admin_home(request):
@@ -40,4 +40,4 @@ def admin_home(request):
 
 def logout_user(request):
     logout(request)
-    return HttpResponseRedirect("/")
+    return HttpResponseRedirect("show_login_page")

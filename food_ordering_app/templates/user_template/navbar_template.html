@@ -1,0 +1,21 @@
+{% load static %}
+<header>
+    <div class="container-fluid px-lg-5">
+        <!-- nav -->
+        <nav class="py-4 d-lg-flex ">
+            <div id="logo">
+                <h1> <a href="{% url 'user_home' %}"><img src="static/images/chef.png" style="height: 90px; width: 90px;">Home Chef</a></h1>
+            </div>
+            <label for="drop" class="toggle">Menu</label>
+            <input type="checkbox" id="drop" />
+            <ul class="menu mt-2 ml-auto pt-4">
+                <li class="active"><a href="{% url 'user_home' %}">Home</a></li>
+                <li class="active"><a href="{% url 'select_baker' %}">Our Bakers</a></li>
+                <li class="active"><a href="/user_login">Login</a></li>
+                <li class="active"><a href="#menu">About</a></li>
+                <li class="active"><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <!-- //nav -->
+    </div>
+</header>

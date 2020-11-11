@@ -1,0 +1,37 @@
+{% extends 'user_template/base_template.html' %}
+{% block main_content %}
+{% block custom_css %}
+
+<div class="row " style="padding-top: 150px; padding-left: 100px;">
+	<div class="col-lg-6">
+        <div id="img-container" >
+
+			<div id="lens" ></div>
+
+			<img id="featured" style="border:1px solid #888" src="{{ product.imageURL }}">
+
+		</div>
+	</div>
+
+	<div style="padding:50px" class="col-lg-6">
+        <a class="btn btn-outline-dark float-right" href="/store">&#x2190; Continue shopping</a>
+		<h3>{{ product.product_name }}</h3>
+		<hr>
+		
+		<!-- <form method="POST" action="{% url 'product' product.id %}">
+			{% csrf_token %}
+			<input min="1" value=1 type="number" name="quantity">
+			<input class="btn btn-dark" type="submit" value="Add to Cart">
+		</form> -->
+      
+		<h2 class="pb-3">Price: ${{ product.price }}</h2>
+		<h4 class="pb-3">Description</h4>
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+		</p>
+		<button data-product="{{ product.id }}" data-action="add" class="btn btn-outline-primary add-btn update-cart float-right" >Add to Cart</button>
+	</div>
+</div>
+
+{% endblock custom_css %}
+{% endblock main_content %}

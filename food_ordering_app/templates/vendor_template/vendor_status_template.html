@@ -1,0 +1,182 @@
+{% extends 'vendor_template/base_template.html' %}
+{% block page_title %}
+
+{% endblock page_title %}
+{% block main_content %}
+
+<section class="content">
+    <div class="container-fluid">
+      <!-- <a class="btn btn-primary" href="/add_product" role="button" style="margin-top: 10px;">+ Add Product</a> <br/>&nbsp; -->
+        <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <!-- <div class="form-group">
+                    {% if messages %}
+                      {% for message in messages %}
+                      {% if message.tags == 'error' %}
+                      <div class="alert alert-danger" style="margin-top:10px;">{{message}}</div>
+                      {% endif %}
+                      {% if message.tags == 'success' %}
+                      <div class="alert alert-success" style="margin-top:10px;">{{message}}</div>
+                      {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  </div> -->
+                  <h3 class="card-title">Product Deatails</h3>
+                  <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                      <!-- drop down for filter -->
+                     
+                      <!-- Enddrop down for filter -->
+                      <div class="input-group-append">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                  <table class="table table-hover text-nowrap">
+                    <thead>
+                      <tr>
+                        <th>Order Id</th>
+                        <th>Product Name</th>
+                        <th>Total</th>
+                        <th>Image</th>
+                        <th>Quantity</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for order in orders %}
+                    {% if order.get_cart_total > 0 %}
+
+                      <tr>
+                          <td>{{ order.id }}</td>
+                        <td>{{ order.customer }}</td>
+                        <td>{{ order.get_cart_total }}</td>
+                        <!-- <td>{{ product.category }}</td>
+                        <td>{{ product.quantity }}</td> -->
+                        
+                            {% for item in order.orderitem_set.all %}
+                            {% if item.product.product_name %}
+                        <td><img class="row-image" src="{{ item.product.imageURL }}" alt="" style="height: 100px;width: 100px;"></td>
+                        <td>{{ item.quantity }}</td>
+                            {% endif %}
+                            {% endfor %}
+                            {% if order.order_status == 'Pending' %}
+                        <td>
+                        <button type="button" class="actual_status btn btn-info btn-md" class="actual_status btn btn-info btn-md">{{order.order_status}}</button>
+                        <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% elif order.order_status == 'Out for delivery' %}
+                        <button type="button" class="actual_status btn btn-warning btn-md" class="actual_status btn btn-info btn-md">{{order.order_status}}</button>
+                        <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% elif order.order_status == 'Completed' %}
+                        <button type="button" class="actual_status btn btn-success btn-md" class="actual_status btn btn-info btn-md">{{order.order_status}}</button></td>
+                        <!-- <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> -->
+                        {%endif%}
+                        <!-- <span class="sr-only">Toggle Dropdown</span>
+                        <div class="dropdown-menu">
+                            {% if order.order_status == 'Pending' %}
+                                
+                                <button data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" >out for delivery</button>
+                                
+                                <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
+                            {%endif%}
+                    
+                            {%if order.order_status == 'Out for delivery' %}
+                                
+                            <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
+                                {%endif%}
+                            {%if order.order_status == 'Completed' %}
+                           
+                            {%endif%}
+                        </div> -->
+                        <div class="dropdown show">
+                            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </a>
+                          
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                              {% if order.order_status == 'Pending' %}
+                              <a data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" href="#">out for delivery</a>
+                              <a data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" href="#">completed</a>
+                              {% elif order.order_status == 'Out for delivery' %}
+                              <a data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" href="#">completed</a>
+                              {% endif %}
+                            </div>
+                          </div>
+                        
+                      </tr>
+                      {% endif %}
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+              
+              
+    </div>
+            <!-- /.card -->
+
+           
+    </div>
+  </section>
+  
+  <script>
+
+     
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+ }
+ var csrftoken = getCookie('csrftoken');
+
+ /*var btn = document.getElementById('order_status1')
+ btn.addEventListener('click',function(){
+    alert('ok')
+    var top = document.getElementById('actual_status')
+    top.innerHTML = 'changed'
+ })*/
+ var statusBtns = document.getElementsByClassName('change_status')
+
+ for(var i = 0; i < statusBtns.length; i++){
+     statusBtns[i].addEventListener('click', function(){
+     var orderId = this.dataset.id
+     var status = this.dataset.status
+     console.log('orderId:', orderId, 'status :', status)
+     var top = document.getElementsByClassName('actual_status')
+     top[0].innerHTML = status
+     // window.location.reload()
+    
+    $.ajax({
+        url: 'update_order',
+        type: 'POST',
+        data: {
+            order_id: orderId,
+            order_status:status,
+            csrfmiddlewaretoken: csrftoken,
+        },
+    });
+
+
+    })
+}
+    
+    
+    </script>
+{% endblock main_content %}

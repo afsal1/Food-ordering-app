@@ -15,15 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from food_ordering_app import views, admin_views, vendor_views
+from food_ordering_app import views, admin_views, vendor_views, user_views
 from django.conf.urls.static import static
 from food_ordering_system import settings
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.show_login_page),
-    path('do_login',views.do_login),
+    path('show_login_page',views.show_login_page, name="show_login_page"),
+    path('do_login',views.do_login, name="do_login"),
     path('admin_home' ,views.admin_home, name="admin_home"),
     path('logout_user' ,views.logout_user, name="logout_user"),
 
@@ -66,10 +66,32 @@ urlpatterns = [
     path('manage_offer' ,vendor_views.manage_offer, name="manage_offer"),
     path('add_offer' ,vendor_views.add_offer, name="add_offer"),
     path('add_offer_save' ,vendor_views.add_offer_save, name="add_offer_save"),
+    path('manage_vendor_order' ,vendor_views.manage_vendor_order, name="manage_vendor_order"),
+    path('update_order' ,vendor_views.update_order, name="update_order"),
     path('edit_offer/<str:offer_id>' ,vendor_views.edit_offer, name="edit_offer"),
     path('edit_offer_save' ,vendor_views.edit_offer_save, name="edit_offer_save"),
     path('delete_offer/<str:offer_id>' ,vendor_views.delete_offer, name="delete_offer"),
 
+
+
+
+#user views
+
+    path('demo_template' ,user_views.demo_template, name="demo_template"),
+    path('' ,user_views.user_home, name="user_home"),
+    path('select_baker' ,user_views.select_baker, name="select_baker"),
+    path('cart/',user_views.cart, name="cart"),
+    # path('selected_baker_product' ,user_views.selected_baker_product, name="selected_baker_product"),
+    path('checkout',user_views.checkout, name="checkout"),
+    path('update_item',user_views.update_item, name="update_item"),
+    path('process_order',user_views.process_order, name="process_order "),
+    path('store',user_views.store, name="store "),
+    path('product/<str:product_id>',user_views.product, name="product"),
+    path('user_login',user_views.user_login, name="user_login"),
+    path('register',user_views.register, name="register"),
+    path('logout',user_views.logout, name="logout"),
+    path('mobile_verification',user_views.mobile_verification, name="mobile_verification"),
+    path('otp_verification',user_views.otp_verification, name="otp_verification"),
 
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)

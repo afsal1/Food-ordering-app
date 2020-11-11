@@ -4,6 +4,12 @@ from django.urls import reverse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from food_ordering_app.models import Vendor, CustomUser, Category
+import base64
+from PIL import Image
+from base64 import decodestring
+from django.core.files.storage import FileSystemStorage
+from django.core.files import File
+from django.core.files.base import ContentFile
 
 
 
@@ -26,10 +32,19 @@ def add_vendor_save(request):
         password=request.POST.get("password")
         shop_name=request.POST.get("shop_name")
         place=request.POST.get("place")
+        image_file =request.POST.get('image64data')
+        print(image_file)
+        value = image_file.strip('data:image/png;base64,')
+
+        format, imgstr = image_file.split(';base64,')
+        ext = format.split('/')[-1]
+
+        data = ContentFile(base64.b64decode(imgstr),name='temp.' + ext)
         #try:
         user = CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=2)
         user.vendor.shop_name=shop_name
         user.vendor.place=place
+        user.vendor.vendor_image=data
         user.save()
         messages.success(request,"Successfully Added Vendor")
         return HttpResponseRedirect(reverse("add_vendor"))
@@ -52,6 +67,14 @@ def edit_vendor_save(request):
         email=request.POST.get("email")
         shop_name=request.POST.get("shop_name")
         place=request.POST.get("place")
+        image_file =request.POST.get('image64data')
+        print(image_file)
+        value = image_file.strip('data:image/png;base64,')
+
+        format, imgstr = image_file.split(';base64,')
+        ext = format.split('/')[-1]
+
+        data = ContentFile(base64.b64decode(imgstr),name='temp.' + ext)
 
         user = CustomUser.objects.get(id=vendor_id)
         print(vendor_id)
@@ -64,6 +87,7 @@ def edit_vendor_save(request):
         vendor=Vendor.objects.get(admin=vendor_id)
         vendor.place=place
         vendor.shop_name=shop_name
+        vendor.vendor_image=data
         vendor.save()
 
         messages.success(request,"Successfully Added Vendor")
