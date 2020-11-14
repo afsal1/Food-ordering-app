@@ -243,6 +243,10 @@ def store(request,vendor_id):
         order, created = OrderDetails.objects.get_or_create(customer = admin1, complete = False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
+        vendor = Vendor.objects.get(id=vendor_id)
+        
+
+        print('fais',vendor)
         
     else:
         # category = Category.objects.all()
@@ -256,7 +260,7 @@ def store(request,vendor_id):
     # vendor = Vendor.objects.get(admin = request.user.id)
     products = Product.objects.filter(vendor_id=vendor_id)
     category = Category.objects.all()
-    context = {'products':products, 'cartItems':cartItems,"items":items,"categories":category}
+    context = {'products':products, 'cartItems':cartItems,"items":items,"categories":category,'vendor':vendor}
     return render(request, 'user_template/view_products_template.html', context)
 
 def cart(request):
@@ -290,8 +294,7 @@ def checkout(request):
         order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
-        id = order.id
-        print("hi", id)
+
         #razor pay
         client = razorpay.Client(auth=('rzp_test_pMt7Hdv04s334f', 'ptMwn6Dlg3ekQKMz40HYkAfK'))
         if request.user.is_authenticated:
@@ -313,6 +316,7 @@ def checkout(request):
         items = []
         order = {'get_cart_total':0,'get_cart_items':0,'shipping':False}
         cartItems = order['get_cart_items']
+
 
     return render(request, 'user_template/checkout_template.html',{"items":items,"order":order,"cartItems":cartItems,"order_id":order_id,"id":id})
 
@@ -475,3 +479,6 @@ def user_view_orders(request):
 
     }
     return render(request,"user_template/user_order_status.html",context)
+
+
+

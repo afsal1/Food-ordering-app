@@ -32,6 +32,7 @@ def add_vendor_save(request):
         password=request.POST.get("password")
         shop_name=request.POST.get("shop_name")
         place=request.POST.get("place")
+        color_picker=request.POST.get("colorpicker")
         image_file =request.POST.get('image64data')
         print(image_file)
         value = image_file.strip('data:image/png;base64,')
@@ -44,6 +45,7 @@ def add_vendor_save(request):
         user = CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=2)
         user.vendor.shop_name=shop_name
         user.vendor.place=place
+        user.vendor.color_picker=color_picker
         user.vendor.vendor_image=data
         user.save()
         messages.success(request,"Successfully Added Vendor")

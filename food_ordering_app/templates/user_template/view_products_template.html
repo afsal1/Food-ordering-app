@@ -6,7 +6,7 @@
 <section class="mid-sec py-5" id="menu">
     <div class="container-fluid py-lg-5">
         <div class="header pb-lg-3 pb-3 text-center">
-            <h3 class="tittle mb-lg-3 mb-3">Bigger & Bolder</h3>
+            <h3 class="tittle mb-lg-3 mb-3">Bigger & Bolder </h3>
         </div>
 
         <div class="middile-inner-con">
@@ -20,15 +20,16 @@
                 {% endfor %}
                 
                 {% for product in products %}
+             
 
                 <section id="content1">
                 <div class="row">
 
                     <div class="col-3">
-                        <div class="ab-info ">
+                        <div style="background-color: {{vendor.color_picker}};" class="ab-info " id="box1">
                             <div class=" ab-content">
                                 <div class="tab-wrap">
-                                    <img src="{{ product.imageURL }}" alt="news image" class="thumbnail">
+                                    <img src="{{ product.imageURL }}" alt="news image" class="thumbnail" >
                                     <div class="ab-info-con">
                                         <a href="/product/ {{ product.id }}"> <h4>{{ product.product_name }}</h4></a>
                                         <p class="price">${{ product.price }}</p>
@@ -36,7 +37,6 @@
                                     </div>
                                 </div>
                             </div>
-
 
                         </div>
                     </div>
@@ -50,7 +50,7 @@
         </div>
     </div>
 </section>
-
+ 
 
 {% endblock custom_css %}
 
