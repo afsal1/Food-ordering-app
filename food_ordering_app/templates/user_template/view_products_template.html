@@ -1,6 +1,7 @@
 {% extends 'user_template/base_template.html' %}
 {% block main_content %}
 {% block custom_css %}
+{% load static %}
 
 <section class="mid-sec py-5" id="menu">
     <div class="container-fluid py-lg-5">
@@ -10,13 +11,14 @@
 
         <div class="middile-inner-con">
             <div class="tab-main mx-auto text-center">
-                    <a href="/cart"><img id="cart-icon" src="static/images/car.png" style="height: 50px; width: 50px;"></a>
+                    <a href="/cart"><img id="cart-icon" src="{% static 'images/car.png' %}" style="height: 50px; width: 50px;"></a>
                     <p id="cart-total" >{{ cartItems }}</p>
                 
                 {% for category in categories %}
-                    <input id="tab1" type="radio" name="tabs" checked>
-                    <label for="tab1"><span class="fa fa-align-center" aria-hidden="true"></span> {{ category.category_name }}</label>
+                    <input hidden id="tab1" type="radio" name="tabs" checked>
+                    <label hidden for="tab1"><span class="fa fa-align-center" aria-hidden="true"></span> {{ category.category_name }}</label>
                 {% endfor %}
+                
                 {% for product in products %}
 
                 <section id="content1">

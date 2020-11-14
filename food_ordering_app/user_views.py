@@ -9,6 +9,7 @@ import json
 import datetime
 from django.views.decorators.csrf import csrf_exempt
 import requests
+import razorpay
 
 
 
@@ -144,9 +145,12 @@ def user_login(request):
     else:
         return render(request,'user_template/user_login.html')
 
-def logout (request):
-    auth.logout(request)
-    return redirect('select_baker')
+
+def user_logout(request):
+    logout(request)
+    return redirect("select_baker")
+
+
 
 def register(request):
     if request.method == 'POST':  
@@ -195,7 +199,9 @@ def user_home(request):
 
 def select_baker(request):
     vendor=Vendor.objects.all()
-    return render(request, "user_template/select_baker_template.html", {"vendors":vendor})
+    context = {"vendors":vendor}
+    return render(request, "user_template/select_baker_template.html", context)
+    
 
 
 # def selected_baker_product(request):
@@ -213,7 +219,7 @@ def select_baker(request):
 
 
 
-def store(request):
+def store(request,vendor_id):
 
     # if request.user.is_superuser:
     #     admin = request.user.id
@@ -241,13 +247,15 @@ def store(request):
     else:
         # category = Category.objects.all()
         # products = Product.objects.all()
+        return redirect("select_baker")
         items = []
         order = {'get_cart_total':0,'get_cart_items':0,'shipping':False}
         cartItems = order['get_cart_items']
         # cookieData = cookieCart(request)
         # cartItems = cookieData['cartItems']
+    # vendor = Vendor.objects.get(admin = request.user.id)
+    products = Product.objects.filter(vendor_id=vendor_id)
     category = Category.objects.all()
-    products = Product.objects.all()
     context = {'products':products, 'cartItems':cartItems,"items":items,"categories":category}
     return render(request, 'user_template/view_products_template.html', context)
 
@@ -256,7 +264,9 @@ def cart(request):
         admin = request.user.customer
         order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
         items = order.orderitem_set.all()
+        
         cartItems = order.get_cart_items
+
 
     else:
         items = []
@@ -280,13 +290,31 @@ def checkout(request):
         order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
+        id = order.id
+        print("hi", id)
+        #razor pay
+        client = razorpay.Client(auth=('rzp_test_pMt7Hdv04s334f', 'ptMwn6Dlg3ekQKMz40HYkAfK'))
+        if request.user.is_authenticated:
+            total = int(order.get_cart_total*100)
+        else:
+            total = int(order['get_cart_total']*100)
+        order_amount =total
+        order_currency = 'INR'
+
+        if order_amount == 0:
+            return redirect('cart')
+        else:
+            response = client.order.create(dict(amount=order_amount,currency=order_currency,payment_capture=0))
+            print(response)
+            order_id = response['id']
+       
 
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0,'shipping':False}
         cartItems = order['get_cart_items']
 
-    return render(request, 'user_template/checkout_template.html',{"items":items,"order":order,"cartItems":cartItems})
+    return render(request, 'user_template/checkout_template.html',{"items":items,"order":order,"cartItems":cartItems,"order_id":order_id,"id":id})
 
 
 def update_item(request):
@@ -299,19 +327,55 @@ def update_item(request):
 
     admin = request.user.customer
     product = Product.objects.get(id=productId)
-    order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
+    vendor = product.vendor_id
+    print("hi",vendor)
+    order , created =OrderDetails.objects.get_or_create( customer = admin,  complete  = False)
 
-    orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
+    if order.vendor_id == vendor:
+        orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
 
-    if action =='add':
-        orderItem.quantity = (orderItem.quantity + 1)
-    elif action =='remove':
-        orderItem.quantity = (orderItem.quantity - 1)
+        if action =='add':
+            orderItem.quantity = (orderItem.quantity + 1)
+        elif action =='remove':
+            orderItem.quantity = (orderItem.quantity - 1)
 
-    orderItem.save()
+        orderItem.save()
 
-    if orderItem.quantity <= 0:
-        orderItem.delete()
+        if orderItem.quantity <= 0:
+             orderItem.delete()
+
+    elif order.vendor_id != vendor:
+        del_item =  order.orderitem_set.all()
+        del_item.delete()
+        order.vendor_id = vendor
+
+        orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
+        order.save()
+        if action =='add':
+            orderItem.quantity = (orderItem.quantity + 1)
+        elif action =='remove':
+            orderItem.quantity = (orderItem.quantity - 1)
+
+        orderItem.save()
+
+        if orderItem.quantity <= 0:
+            orderItem.delete()
+        
+    else:
+        order.vendor_id = vendor
+
+        orderItem, created = OrderItem.objects.get_or_create(order=order,product=product)
+        order.save()
+
+        if action =='add':
+            orderItem.quantity = (orderItem.quantity + 1)
+        elif action =='remove':
+            orderItem.quantity = (orderItem.quantity - 1)
+
+        orderItem.save()
+
+        if orderItem.quantity <= 0:
+            orderItem.delete()
         
     return JsonResponse('Item was Added', safe=False)
 
@@ -378,3 +442,36 @@ def product(request, product_id):
 
 
     return render(request, 'user_template/product_view_template.html', context)
+
+
+
+def user_view_orders(request):
+    # try:
+    customer=request.user.customer
+    print(customer)
+    order=OrderDetails.objects.filter(customer=customer,complete=True)
+    items =[]
+    for i in order:
+        details=OrderItem.objects.filter(order=i,product__isnull=False)
+        for j in details:
+            items.append(j)
+
+    if request.user.is_authenticated:
+        customer=request.user.customer
+        order, created = OrderDetails.objects.get_or_create(customer=customer,complete=False)
+        # items=order.orderitem_set.all()
+        cartItems=order.get_cart_items
+
+    else:
+        # items=[]
+        order ={'get_cart_total':0,'get_cart_items':0,'shipping':False}
+        cartItems=order['get_cart_items']
+    # except:
+    #     return redirect("/")
+    context ={
+        "items":items,
+        "order":order,
+        "cartItems":cartItems,
+
+    }
+    return render(request,"user_template/user_order_status.html",context)

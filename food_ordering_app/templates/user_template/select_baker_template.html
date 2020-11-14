@@ -5,24 +5,41 @@
 {% block main_content %}
 {% block custom_css %}
 <section class="services py-5" id="services">
+<link rel="stylesheet" href="static/css/style.css">
+
     <div class="container py-md-5">
         <div class="header pb-lg-3 pb-3 text-center">
             <h3 class="tittle two mb-lg-3 mb-3 pt-5">Our Bakers</h3>
         </div>
         <div class="row">
         {% for vendor in vendors %}
-        <div class=" ab-info  pb-5 pl-5">
-            <div class="ab-content">
-                <div class="ab-content-inner">
-                   <img src="{{ vendor.imageURL }}" alt="news image" class="img-fluid">
-                    <div class="ab-info-con">
-                        <h4>{{ vendor.shop_name }}</h4>
-                        <h4>{{ vendor.place }}</h4>
-                        <a href="/store" class="btn btn-dark ">Select</a>
+        <table>
+            <td>
+                <tr>
+                    <div class=" ab-info  pb-5 pl-5">
+                        <div class="ab-content">
+                            <div class="ab-content-inner">
+                            <img src="{{ vendor.imageURL }}" alt="news image" class="img-fluid">
+                                <div class="ab-info-con pb-5">
+                                    <h4 >{{ vendor.shop_name }}</h4>
+                                    <h4 class="pb-4">{{ vendor.place }}</h4>
+                                    <a href="{% url 'store' vendor.id %}" class=" " style="
+                                    
+                                        background-color: rgb(0, 0, 0);
+                                        width: 20px;
+                                        height: 20px;
+                                        padding-left: 15px;
+                                        padding-right: 15px;
+                                        border: 5px solid rgb(0, 0, 0);
+                                        color:blanchedalmond;
+                                    ">Select</a>
+                                </div>
+                            </div>
+                        </div> 
                     </div>
-                </div>
-            </div> 
-        </div>
+                </tr>
+               </td>
+              </table>  
     {% endfor %}
 </div>
 

@@ -20,7 +20,7 @@ for(var i = 0; i < updateBtns.length; i++){
 function updateUserOrder(productId, action){
     console.log('User logged in, sending data...')
 
-    var url = 'update_item'
+    var url = '/update_item'
     console.log('URL:', url)
 
     fetch(url,{

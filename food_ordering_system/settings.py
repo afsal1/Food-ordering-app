@@ -46,6 +46,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'food_ordering_app',
+    'django.contrib.sites',
+
+    #allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    #providers
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.twitter',
+
 ]
 
 MIDDLEWARE = [
@@ -59,6 +72,18 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'food_ordering_system.urls'
+
+
+# AUTHENTICATION_BACKENDS = [
+#     ...
+#     # Needed to login by username in Django admin, regardless of `allauth`
+#     'django.contrib.auth.backends.ModelBackend',
+
+#     # `allauth` specific authentication methods, such as login by e-mail
+#     'allauth.account.auth_backends.AuthenticationBackend',
+#     ...
+# ]
+
 
 TEMPLATES = [
     {
@@ -136,3 +161,7 @@ USE_TZ = True
 
 
 AUTH_USER_MODEL="food_ordering_app.CustomUser"
+
+SITE_ID=1
+
+LOGIN_REDIRECT_URL ="select_baker"

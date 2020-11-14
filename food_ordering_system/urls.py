@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path , include
 from food_ordering_app import views, admin_views, vendor_views, user_views
 from django.conf.urls.static import static
 from food_ordering_system import settings
@@ -26,6 +26,7 @@ urlpatterns = [
     path('do_login',views.do_login, name="do_login"),
     path('admin_home' ,views.admin_home, name="admin_home"),
     path('logout_user' ,views.logout_user, name="logout_user"),
+    path('accounts/' ,include('allauth.urls')),
 
 #admin Views 
 
@@ -67,7 +68,7 @@ urlpatterns = [
     path('add_offer' ,vendor_views.add_offer, name="add_offer"),
     path('add_offer_save' ,vendor_views.add_offer_save, name="add_offer_save"),
     path('manage_vendor_order' ,vendor_views.manage_vendor_order, name="manage_vendor_order"),
-    path('update_order' ,vendor_views.update_order, name="update_order"),
+    path('update_order/' ,vendor_views.update_order, name="update_order"),
     path('edit_offer/<str:offer_id>' ,vendor_views.edit_offer, name="edit_offer"),
     path('edit_offer_save' ,vendor_views.edit_offer_save, name="edit_offer_save"),
     path('delete_offer/<str:offer_id>' ,vendor_views.delete_offer, name="delete_offer"),
@@ -85,13 +86,15 @@ urlpatterns = [
     path('checkout',user_views.checkout, name="checkout"),
     path('update_item',user_views.update_item, name="update_item"),
     path('process_order',user_views.process_order, name="process_order "),
-    path('store',user_views.store, name="store "),
+    path('store/<int:vendor_id>',user_views.store, name="store"),
     path('product/<str:product_id>',user_views.product, name="product"),
     path('user_login',user_views.user_login, name="user_login"),
     path('register',user_views.register, name="register"),
     path('logout',user_views.logout, name="logout"),
     path('mobile_verification',user_views.mobile_verification, name="mobile_verification"),
     path('otp_verification',user_views.otp_verification, name="otp_verification"),
+    path('user_logout',user_views.user_logout, name="user_logout"),
+    path('user_view_orders',user_views.user_view_orders, name="user_view_orders"),
 
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)

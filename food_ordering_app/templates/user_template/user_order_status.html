@@ -1,0 +1,67 @@
+{% extends "user_template/base_template.html" %}
+{% load static %}
+{% block content %}
+{% block custom_css %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <div class="form-group">
+                    
+                  </div>
+                  <h3 class="card-title">Dealer Details</h3>
+                  <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                      <!-- drop down for filter -->
+                     
+                      <!-- Enddrop down for filter -->
+                      <div class="input-group-append">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                  <table class="table table-hover text-nowrap">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Date ordered</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                      <tr>
+                        <td><img class="row-image" src="{{ item.product.imageURL }}" alt="" style="height: 50px;width: 50px;"></td>
+                        <td style="font-weight: bold; color: black;">{{ item.product.product_name }}</td>
+                        <td style="font-weight: bold; color: black;">{{ item.quantity }}</td>
+                        <td style="font-weight: bold; color: black;">{{ item.get_total }}</td>
+                        <td style="font-weight: bold; color: black;">{{ item.order.date_ordered }}</td>
+                        <td style="font-weight: bold; color: black;">{{ item.order.order_status }}</td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+              
+              
+    </div>
+            <!-- /.card -->
+
+           
+    </div>
+  </section>
+  <!-- /.content -->
+{% endblock custom_css %}
+{% endblock %}

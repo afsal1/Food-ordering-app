@@ -16,7 +16,6 @@
                     </div>
                 </div>
                 <div id="shipping-info" class="shipping-info pl-3">
-                <a class="btn btn-outline-dark" href="/store">&#x2190; Back to Store</a>
 
                     <hr>
                     <p>Shipping Information:</p>
@@ -31,13 +30,14 @@
                         <input class="form-control" type="text" name="state" placeholder="State..">
                     </div>
                     <div class="form-field pt-2">
-                        <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                        <input class="form-control" type="text" name="zipcode" placeholder="Pin code..">
                     </div>
 
 
                 </div>
                 <hr>
                 <div class="pl-3">
+                <!-- <input type="hidden" name="amount" id="amount"> -->
                 <input class="btn btn-success btn-block " id="form-button"  type="submit" value="Continue">
                 </div>
                 </form>
@@ -45,7 +45,9 @@
             <br>
             <div class="box-element hidden" id="payment-info">
                 <small>Paypal Options</small>
-                <button id="make-payment">Make Payment</button>
+                <div id="paypal-button-container"></div>
+                <button id="rzp-button1">Pay With Razorpay</button>
+                <!-- <button id="make-payment">Make Payment</button> -->
 
             </div>
         </div>
@@ -62,7 +64,7 @@
                 <hr>
                 {% for item in items %}
                 <div class="cart-row">
-                    <div style="flex:2"><img class="row-image" src="{{ item.product.product_imageURL }}"></div>
+                    <div class="pl-5" style="flex:2"><img style="height: 50px; width: 50px;" class="row-image" src="{{ item.product.imageURL }}"></div>
                     <div style="flex:2"><p>{{ item.product.product_name }}</p></div>
                     <div style="flex:1"><p>{{ item.product.price|floatformat:2 }}</p></div>
                     <div style="flex:1"><p>{{ item.quantity }}</p></div>
@@ -77,11 +79,81 @@
         </div>
 
     </div>
+<script>
+    // $('#amount1').val($('#totalPrice').html())
+</script>
 
+<script src="https://www.paypal.com/sdk/js?client-id=AXKEraMJLNUKQA8qPJw2xN37wU9LAnrr-qLTJkpUW5b78TjIrdGRhOKgOz_lWSI1hATSh815laysc97g&currency=USD"></script>
 
 <script>
+    var total = '{{ order.get_cart_total }}'
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        style:{
+             color : 'white',
+             shape : 'pill',
+         },
+
+        // Set up the transaction
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: parseFloat(total).toFixed(2)
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // Show a success message to the buyer
+                // alert('Transaction completed by ' + details.payer.name.given_name + '!');
+                submitFormData()
+            });
+        }
+
+
+    }).render('#paypal-button-container');
+
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options={
+    "key":"rzp_test_pMt7Hdv04s334f" ,
+    "amount":'{{ order.get_cart_total }}',
+    "currency":"INR",
+    "order_id":'{{ order_id }}',
+
+    "handler": function (response){
+    submitFormData()
+    },
+    "prefill": {
+            
+            "name": "{{user.username}}",
+            "email": "{{user.email}}",
+            "contact": "{{user.last_name}}"
+        },
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#F37254"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    
+</script>
+<script>
     var shipping = '{{ order.shipping }}'
-    var total ='{{ order.get_cart_total }} '
 
     if (shipping == 'False'){
         document.getElementById('shipping-info').innerHTML = ''
@@ -106,9 +178,9 @@
         document.getElementById('payment-info').classList.remove('hidden')
     })
 
-    document.getElementById('make-payment').addEventListener('click',function(e){
-        submitFormData()
-    })
+    // document.getElementById('make-payment').addEventListener('click',function(e){
+    //     submitFormData()
+    // })
     
     function submitFormData(){
         console.log('payment Button')
@@ -156,7 +228,7 @@
         .then((data) => {
             console.log('Success:',data);
             alert('Transaction completed');
-            window.location.href="/store"
+            window.location.href="/select_baker"
         })
     }
 </script>

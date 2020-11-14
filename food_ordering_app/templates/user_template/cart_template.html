@@ -1,4 +1,5 @@
 {% extends 'user_template/base_template.html' %}
+{% load static %}
 {% block main_content %}
 {% block custom_css %}
 
@@ -7,10 +8,10 @@
 <div class="row" >
     
     <div class="col-lg-12">
-        <a href="/cart"><img id="cart-icon" src="static/images/car.png" ></a>
+        <a href="/cart"><img id="cart-icon" src="{% static 'images/car.png' %}" ></a>
         <p id="cart-total" >{{ cartItems }}</p>
         <div class="box-element pl-5" style="padding-top: 150px; ">
-            <a class="btn btn-outline-dark" href="/store" >&#x2190; Continue shopping</a>
+            <a class="btn btn-outline-dark" href="{% url 'store' 1 %}" >&#x2190; Continue shopping</a>
             <br>
             <br>
             <table class="table" >
@@ -49,16 +50,17 @@
             </style>
 
             {% for item in items %}
-            <div class="cart-row" >
-                <div style="flex:2" ><img class="row-image" src="{{ item.product.product_imageURL }}" alt=""></div>
+            <div class="cart-row pl-5" >
+                <div style="flex:2" ><img class="row-image" src="{{ item.product.imageURL }}" style="height: 50px; width: 50px;" alt=""></div>
                 <div style="flex:2" >{{ item.product.product_name }}</div>
                 <div style="flex:1" >{{ item.product.price|floatformat:2 }}</div>
                 <div style="flex:1" >
                     <p class="quantity" >{{ item.quantity }}</p>
+                    
                     <div class="quantity" >
                         
-                        <a href=""><img data-product="{{ item.product.id }}" data-action="add" class="chg-quantity update-cart" src="static/images/plus.jpg" alt=""></a>
-                        <a href=""><img data-product="{{ item.product.id }}" data-action="remove" class="chg-quantity update-cart" src="static/images/minus.png" alt=""></a>
+                        <a href=""><img data-product="{{ item.product.id }}" data-action="add" class="chg-quantity update-cart pb-2" src="{% static 'images/plus.jpg' %}" alt=""></a>
+                        <a href=""><img data-product="{{ item.product.id }}" data-action="remove" class="chg-quantity update-cart pt-2" src="{% static 'images/minus.png' %}" alt=""></a>
                     </div>
                 </div>
                 <div style="flex:1" >{{ item.get_total }}</div>

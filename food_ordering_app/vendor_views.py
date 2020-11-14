@@ -214,13 +214,9 @@ def delete_offer(request,offer_id):
 
 
 def manage_vendor_order(request):
+    
     orders = OrderDetails.objects.all()
-    # print(orders[0].customer)
-    context = {
-        "orders":orders,
-    }
-
-    return render(request,"vendor_template/vendor_status_template.html",context)
+    return render(request,"vendor_template/vendor_status_template.html",{"orders":orders})
 
 
 def update_order(request):

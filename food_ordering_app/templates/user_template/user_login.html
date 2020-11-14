@@ -1,3 +1,5 @@
+{% load socialaccount %}
+{% providers_media_js %}
 <!DOCTYPE html>
 <html>
     
@@ -102,7 +104,12 @@
 
 							<div class="d-flex justify-content-center mt-3 login_container">
 				 				<input class="btn login_btn" type="submit" value="Login">
-				   			</div>
+							   </div>
+							   <div>
+								   <button><a href="{% provider_login_url 'google' %}">Google Login</a></button>
+								   <button><a href="{% provider_login_url 'github' %}">Github Login</a></button>
+								   <button><a href="{% provider_login_url 'facebook' method='oauth2' %}">Facebook Login</a></button>
+							   </div>
 					</form>
 
 				</div>
@@ -119,7 +126,7 @@
 				</div>
 				<div class="mt-4">
 					<div class="d-flex justify-content-center links">
-						OTP <a href="{% url 'mobile_verification' %}" class="ml-2">Login with mobile number</a>
+						OTP <a href="/mobile_verification" class="ml-2">Login with mobile number</a>
 					</div>
 				</div>
 
