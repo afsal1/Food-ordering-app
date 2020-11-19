@@ -79,8 +79,8 @@ urlpatterns = [
 #user views
 
     path('demo_template' ,user_views.demo_template, name="demo_template"),
-    path('' ,user_views.user_home, name="user_home"),
-    path('select_baker' ,user_views.select_baker, name="select_baker"),
+    path('user_home' ,user_views.user_home, name="user_home"),
+    path('' ,user_views.select_baker, name="select_baker"),
     path('cart/',user_views.cart, name="cart"),
     # path('selected_baker_product' ,user_views.selected_baker_product, name="selected_baker_product"),
     path('checkout',user_views.checkout, name="checkout"),
@@ -95,6 +95,11 @@ urlpatterns = [
     path('otp_verification',user_views.otp_verification, name="otp_verification"),
     path('user_logout',user_views.user_logout, name="user_logout"),
     path('user_view_orders',user_views.user_view_orders, name="user_view_orders"),
+    path('payment',user_views.payment, name="payment"),
+    path('response/',user_views.response, name="response"),
+    path('VerifyPaytmResponse',user_views.VerifyPaytmResponse, name="VerifyPaytmResponse"),
+    path('category/<str:vendor_id>/<str:cat_id>',user_views.category, name="category"),
+    path('getshipping/',user_views.Getshipping.as_view()),
 
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)

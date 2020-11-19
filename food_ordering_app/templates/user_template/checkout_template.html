@@ -9,10 +9,10 @@
                 <form id="form">
                 <div id="user-info" class="pl-3">
                     <div class="form-field" style="padding-top: 150px;">
-                        <input required class="form-control " type="text" name="name" placeholder="Name.." >
+                        <input hidden class="form-control " type="text" name="name" placeholder="Name.." >
                     </div>
                     <div class="form-field pt-2">
-                        <input required class="form-control" type="email" name="email" placeholder="Email..">
+                        <input hidden class="form-control" type="email" name="email" placeholder="Email..">
                     </div>
                 </div>
                 <div id="shipping-info" class="shipping-info pl-3">
@@ -21,20 +21,42 @@
                     <p>Shipping Information:</p>
                     <hr>
                     <div class="form-field pt-2" >
-                        <input class="form-control" type="text" name="address" placeholder="Address..">
+                        <input class="form-control" id="add1" type="text" name="address" placeholder="Address..">
                     </div>
                     <div class="form-field pt-2">
-                        <input class="form-control" type="text" name="city" placeholder="City..">
+                        <input class="form-control" id="city" type="text" name="city" placeholder="City..">
                     </div>
                     <div class="form-field pt-2">
-                        <input class="form-control" type="text" name="state" placeholder="State..">
+                        <input class="form-control" id="stat" type="text" name="state" placeholder="State..">
                     </div>
                     <div class="form-field pt-2">
-                        <input class="form-control" type="text" name="zipcode" placeholder="Pin code..">
+                        <input class="form-control" id="zip" type="text" name="zipcode" placeholder="Pin code..">
                     </div>
 
 
                 </div>
+                {% if user.is_authenticated %}
+								<div class="section-title pl-3">
+									<h3 class="title">Select address</h3>
+                                </div>
+							<div class="row">
+                                
+								{% for shi in shipping %}
+									<div class="col-4 pt-5 pl-5 pr-5">
+										<div class="card text-center card-product"
+											style="background-color:rgba(255, 255, 255, 0.1);; color: black; height: 200px; width: 150px;">
+											<div class="card-body" style="color: black;">
+												<h6 id="addd1" data-mo="{{shi.address}}" style="padding-top: 20px;">{{shi.address}}</h6>
+												<p id="addd2">{{shi.city}}</p>
+												<p id="addd3">{{shi.state}}</p>
+												<p id="addd4">{{shi.zipcode}}</p>
+												<input id="myCheck" name="{{shi.id}}" type="checkbox">
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+							{% endif %}
                 <hr>
                 <div class="pl-3">
                 <input class="btn btn-success btn-block " id="form-button"  type="submit" value="Continue">
@@ -45,8 +67,11 @@
             <div class="box-element hidden" id="payment-info">
                 <small>Paypal Options</small>
                 <div id="paypal-button-container"></div>
-                <button id="rzp-button1">Pay With Razorpay</button>
+                <button id="rzp-button1" class="btn btn-outline-dark btn-block">Pay With Razorpay</button>
+                <div class="pt-3">
                 <!-- <button id="make-payment">Make Payment</button> -->
+                <a href="{% url 'payment' %}" ><button class="btn btn-outline-primary btn-block" id="hai">Pay with Paytm</button></a>
+                </div>
 
             </div>
         </div>
@@ -176,9 +201,10 @@
         document.getElementById('payment-info').classList.remove('hidden')
     })
 
-    // document.getElementById('make-payment').addEventListener('click',function(e){
-    //     submitFormData()
-    // })
+    document.getElementById('hai').addEventListener('click',function(e){
+       
+        submitFormData()
+    })
     
     function submitFormData(){
         console.log('payment Button')
@@ -229,6 +255,53 @@
             window.location.href="/select_baker"
         })
     }
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        const a1 = document.querySelectorAll('#addd1')
+        var yyy = document.querySelectorAll("#myCheck")
+        // 
+        console.log(a1)
+        console.log(yyy);
+        yyy.forEach((dd) => {
+            const sss = dd.name
+            console.log(sss);
+
+            $(dd).change(function () {
+                if (dd.checked == true) {
+                    console.log("error")
+                    console.log(dd.name)
+
+                    $.ajax({
+                        url: '/getshipping/',
+                        type: 'GET',
+                        data: {
+                            ship_id: dd.name
+                        },
+                        success: function (response) {
+                            console.log(response.count2.address)
+                            console.log(response.count2.city)
+                            console.log(response.count2.state)
+                            console.log(response.count2.zipcode)
+
+                            $("#add1").val(response.count2.address)
+                            $("#city").val(response.count2.city)
+                            $("#stat").val(response.count2.state)
+                            $("#zip").val(response.count2.zipcode)
+                        }
+                    });
+                } else {
+                    $("#add1").val("")
+                    $("#city").val("")
+                    $("#stat").val("")
+                    $("#zip").val("")
+                }
+            })
+            // console.log(yyy)
+        })
+    })
 </script>
 
 {% endblock custom_css %}

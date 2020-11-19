@@ -5,6 +5,14 @@ for(var i = 0; i < updateBtns.length; i++){
     
     var productId = this.dataset.product
     var action = this.dataset.action
+    var val = document.getElementById("cart-total").textContent
+    if (action == 'add'){
+        val ++;
+    }else{
+        val --;
+    }
+    console.log('new cart', val)
+    document.getElementById("cart-total").innerHTML = val
     console.log('productId:', productId, 'action :', action )
     console.log('USER:',user)
 
@@ -40,7 +48,7 @@ function updateUserOrder(productId, action){
 
     .then((data)=>{
         console.log('Data:',data)
-        location.reload()
+        // location.reload()
     })
 
 }

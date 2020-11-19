@@ -165,3 +165,13 @@ AUTH_USER_MODEL="food_ordering_app.CustomUser"
 SITE_ID=1
 
 LOGIN_REDIRECT_URL ="select_baker"
+
+PAYTM_COMPANY_NAME = "Company Name"   # For representation purposes 
+PAYTM_INDUSTRY_TYPE_ID = "Retail"     # For staging environment
+PAYTM_CHANNEL_ID = "WEB"
+PAYTM_MERCHANT_KEY = "0HmYlIDiiAJRv#17"
+PAYTM_MERCHANT_ID = "UtsfmO75056070825322"
+PAYTM_CALLBACK_URL = "http://localhost:8000/response/" # Hardcode
+PAYTM_WEBSITE = "WEBSTAGING"
+PAYTM_PAYMENT_GATEWAY_URL = "https://securegw-stage.paytm.in/order/process"
+PAYTM_TRANSACTION_STATUS_URL = "https://securegw-stage.paytm.in/order/status"

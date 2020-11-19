@@ -13,18 +13,7 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <!-- <div class="form-group">
-                  {% if messages %}
-                    {% for message in messages %}
-                    {% if message.tags == 'error' %}
-                    <div class="alert alert-danger" style="margin-top:10px;">{{message}}</div>
-                    {% endif %}
-                    {% if message.tags == 'success' %}
-                    <div class="alert alert-success" style="margin-top:10px;">{{message}}</div>
-                    {% endif %}
-                    {% endfor %}
-                  {% endif %}
-                </div> -->
+               
                 <h3 class="card-title">Product Deatails</h3>
                 <div class="card-tools">
                   <div class="input-group input-group-sm" style="width: 150px;">
@@ -75,23 +64,7 @@
                       <button type="button" class="actual_status btn btn-success btn-md" >{{order.order_status}}</button>
                       <!-- <button type="button" class="btn btn-light dropdown-toggle px-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> -->
                       {%endif%}
-                      <!-- <span class="sr-only">Toggle Dropdown</span>
-                      <div class="dropdown-menu">
-                          {% if order.order_status == 'Pending' %}
-                              
-                              <button data-id="{{order.id}}"  data-status="Out for delivery" class=" change_status dropdown-item" >out for delivery</button>
-                              
-                              <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
-                          {%endif%}
-                  
-                          {%if order.order_status == 'Out for delivery' %}
-                              
-                          <button  data-id="{{order.id}}"  data-status="Completed" class=" change_status dropdown-item" >completed</button>
-                              {%endif%}
-                          {%if order.order_status == 'Completed' %}
-                         
-                          {%endif%}
-                      </div> -->
+                     
 
                       <div class="dropdown show">
                           <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -150,12 +123,7 @@
     }
     var csrftoken = getCookie('csrftoken');
   
-      /*var btn = document.getElementById('order_status1')
-      btn.addEventListener('click',function(){
-          alert('ok')
-          var top = document.getElementById('actual_status')
-          top.innerHTML = 'changed'
-      })*/
+
       var statusBtns = document.getElementsByClassName('change_status')
   
       for(var i = 0; i < statusBtns.length; i++){
@@ -168,7 +136,7 @@
           window.location.reload()
           
           $.ajax({
-              url: '/update_order/',
+              url: '/update_order',
               type: 'post',
               data: {
                 order_id: orderId,

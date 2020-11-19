@@ -14,51 +14,39 @@
                     <a href="/cart"><img id="cart-icon" src="{% static 'images/car.png' %}" style="height: 50px; width: 50px;"></a>
                     <p id="cart-total" >{{ cartItems }}</p>
                 
-                {% for category in categories %}
-                    <input hidden id="tab1" type="radio" name="tabs" checked>
-                    <a hidden href="{% url 'category' vendor.id category.id %}"> {{ category.category_name }}</a>
-                {% endfor %}
-                <section id="content1">
-                    <div class="row">
-
                 {% for product in products %}
              
-                
-                      <div class="col-md-4 ab-content">
-                        <div class="tab-wrap" style="background-color: {{vendor.color_picker}};"  id="box1">
+
+                <section id="content1">
+                <div class="row">
+
+                    <div class="col-3">
+                        <div style="background-color: {{vendor.color_picker}};" class="ab-info " id="box1">
+                            <div class=" ab-content">
+                                <div class="tab-wrap">
                                     <img src="{{ product.imageURL }}" alt="news image" class="thumbnail" >
                                     <div class="ab-info-con">
                                         <a href="/product/ {{ product.id }}"> <h4>{{ product.product_name }}</h4></a>
                                         <p class="price">${{ product.price }}</p>
-                                        <button data-product="{{ product.id }}" onclick="add_cart()" data-action="add" href="" class="read-more scroll btn btn-danger update-cart">Add to Cart </button>
+                                        <button data-product="{{ product.id }}" data-action="add" href="" class="read-more scroll btn btn-danger update-cart">Add to Cart </button>
                                     </div>
+                                </div>
+                            </div>
+
                         </div>
+                    </div>
 
-                      </div>
-
+                </section>
 
                 {% endfor %}
-            </div>
-
-            </section>
 
             </div>
-
-            </div>
-   
+        </div>
+        </div>
     </div>
 </section>
  
 
 {% endblock custom_css %}
-{% block custom_js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script>
-$(function() {
-    $('button').click(function() {
-      alert("Item added to cart");
-    });
- });
-</script>
-{% endblock custom_js %}
+
 {% endblock main_content %}

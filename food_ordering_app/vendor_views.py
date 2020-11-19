@@ -146,7 +146,8 @@ def manage_offer(request):
     return render(request, "vendor_template/manage_offer_template.html",{"offers":offer})
 
 def add_offer(request):
-    product = Product.objects.all()
+    vendor = Vendor.objects.get(admin=request.user.id)
+    product = Product.objects.filter(vendor_id=vendor)
     return render(request, "vendor_template/add_offer_template.html",{"products":product})
 
 

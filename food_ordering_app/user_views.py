@@ -10,6 +10,9 @@ import datetime
 from django.views.decorators.csrf import csrf_exempt
 import requests
 import razorpay
+from . import Checksum  
+from django.conf import settings
+from django.views.generic import View
 
 
 
@@ -199,7 +202,16 @@ def user_home(request):
 
 def select_baker(request):
     vendor=Vendor.objects.all()
-    context = {"vendors":vendor}
+    if request.user.is_authenticated:
+        admin1 = request.user.customer
+        order, created = OrderDetails.objects.get_or_create(customer = admin1, complete = False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        items = []
+        order = {'get_cart_total':0,'get_cart_items':0,'shipping':False}
+        cartItems = order['get_cart_items']
+    context = {"vendors":vendor,"order":order,"cartItems":cartItems,"items":items}
     return render(request, "user_template/select_baker_template.html", context)
     
 
@@ -232,7 +244,7 @@ def store(request,vendor_id):
         login_user = request.user
         login_name = request.user.username
         login_email = request.user.email
-        user, created = Customer.objects.get_or_create( admin = login_user, name = login_name, email = login_email)
+        user = Customer.objects.filter( admin = login_user, name = login_name, email = login_email)
         print(login_user)
         print(login_name)
         print(login_email)
@@ -246,7 +258,6 @@ def store(request,vendor_id):
         vendor = Vendor.objects.get(id=vendor_id)
         
 
-        print('fais',vendor)
         
     else:
         # category = Category.objects.all()
@@ -262,6 +273,26 @@ def store(request,vendor_id):
     category = Category.objects.all()
     context = {'products':products, 'cartItems':cartItems,"items":items,"categories":category,'vendor':vendor}
     return render(request, 'user_template/view_products_template.html', context)
+
+
+def category(request,vendor_id,cat_id):
+    if request.user.is_authenticated:
+        category = Category.objects.all()
+        cat = Category.objects.get(id=cat_id)
+        cat_name = cat.category_name
+        print(cat_name,"haloe")
+        product1 = Product.objects.filter(vendor_id=vendor_id,category=cat)
+        print("ff",product1)
+        admin1 = request.user.customer
+        order, created = OrderDetails.objects.get_or_create(customer = admin1, complete = False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+        vendor = Vendor.objects.get(id=vendor_id)
+        
+    context={"product1":product1,"cat_name":cat_name, 'cartItems':cartItems,"items":items}
+    return render(request, 'user_template/category_template.html',context)
+
+
 
 def cart(request):
     if request.user.is_authenticated:
@@ -303,7 +334,8 @@ def checkout(request):
             total = int(order['get_cart_total']*100)
         order_amount =total
         order_currency = 'INR'
-
+        admin = request.user.customer
+        ship = ShippingAdress.objects.filter(customer=admin).distinct()
         if order_amount == 0:
             return redirect('cart')
         else:
@@ -318,7 +350,27 @@ def checkout(request):
         cartItems = order['get_cart_items']
 
 
-    return render(request, 'user_template/checkout_template.html',{"items":items,"order":order,"cartItems":cartItems,"order_id":order_id,"id":id})
+    return render(request, 'user_template/checkout_template.html',{'shipping':ship,"items":items,"order":order,"cartItems":cartItems,"order_id":order_id,"id":id})
+
+
+class Getshipping(View):
+    def get(self, request):
+        text = request.GET.get('ship_id')
+        print(text)
+
+        shipi = ShippingAdress.objects.get(id=text)
+
+        a = shipi.address
+        b = shipi.city
+        vb = {
+            'address': shipi.address,
+            'city': shipi.city,
+            'state': shipi.state,
+            'zipcode': shipi.zipcode,
+
+        }
+        return JsonResponse({'count2': vb}, status=200)
+        return redirect('/')
 
 
 def update_item(request):
@@ -481,4 +533,74 @@ def user_view_orders(request):
     return render(request,"user_template/user_order_status.html",context)
 
 
+def payment(request):
+    admin = request.user.customer
+    order, created = OrderDetails.objects.get_or_create(customer = admin, complete = False)
+    print(order)
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
+    order_id = Checksum.__id_generator__()
+    print(Checksum.__id_generator__(),'hai')
+    bill_amount = str(order.get_cart_total)
+    data_dict = {
+        'MID': settings.PAYTM_MERCHANT_ID,
+        'INDUSTRY_TYPE_ID': settings.PAYTM_INDUSTRY_TYPE_ID,
+        'WEBSITE': settings.PAYTM_WEBSITE,
+        'CHANNEL_ID': settings.PAYTM_CHANNEL_ID,
+        'CALLBACK_URL': settings.PAYTM_CALLBACK_URL,
+        'MOBILE_NO': '7405505665',
+        'EMAIL': 'dhaval.savalia6@gmail.com',
+        'CUST_ID': '123123',
+        'ORDER_ID':order_id,
+        'TXN_AMOUNT': bill_amount,
+    } # This data should ideally come from database
+    data_dict['CHECKSUMHASH'] = Checksum.generate_checksum(data_dict, settings.PAYTM_MERCHANT_KEY)
+    context = {
+        'payment_url': settings.PAYTM_PAYMENT_GATEWAY_URL,
+        'comany_name': settings.PAYTM_COMPANY_NAME,
+        'data_dict': data_dict
+    }
+    return render(request, 'user_template/payment.html', context)
 
+
+@csrf_exempt
+def response(request):
+    resp = VerifyPaytmResponse(request)
+    if resp['verified']:
+        # save success details to db; details in resp['paytm']
+        return redirect("user_view_orders")
+    else:
+        # check what happened; details in resp['paytm']
+        return render(request, 'user_template/paytm_response_template.html')
+
+
+
+def VerifyPaytmResponse(response):
+    response_dict = {}
+    if response.method == "POST":
+        data_dict = {}
+        for key in response.POST:
+            data_dict[key] = response.POST[key]
+        MID = data_dict['MID']
+        ORDERID = data_dict['ORDERID']
+        verify = Checksum.verify_checksum(data_dict, settings.PAYTM_MERCHANT_KEY, data_dict['CHECKSUMHASH'])
+        if verify:
+            STATUS_URL = settings.PAYTM_TRANSACTION_STATUS_URL
+            headers = {
+                'Content-Type': 'application/json',
+            }
+            data = '{"MID":"%s","ORDERID":"%s"}'%(MID, ORDERID)
+            check_resp = requests.post(STATUS_URL, data=data, headers=headers).json()
+            if check_resp['STATUS']=='TXN_SUCCESS':
+                response_dict['verified'] = True
+                response_dict['paytm'] = check_resp
+                return (response_dict)
+            else:
+                response_dict['verified'] = False
+                response_dict['paytm'] = check_resp
+                return (response_dict)
+        else:
+            response_dict['verified'] = False
+            return (response_dict)
+    response_dict['verified'] = False
+    return response_dict
