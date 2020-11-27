@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 
 
 
+
 def manage_vendor(request):
     vendor=Vendor.objects.all()
     return render(request, "admin_template/manage_vendor_template.html",{"vendors":vendor})

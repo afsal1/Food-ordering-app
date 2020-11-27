@@ -14,6 +14,7 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 
 
+
 def show_vendor_login_page(request):
     return render(request, "vendor_template/login_page.html")
 
@@ -49,6 +50,10 @@ def logout_vendor(request):
     logout(request)
     return redirect( "show_vendor_login_page")
 
+
+
+
+
 def manage_product(request):
 
     vendor = Vendor.objects.get(admin = request.user.id)
@@ -69,6 +74,8 @@ def add_product_save(request):
         category_id=request.POST.get("category_name")
         category_name=Category.objects.get(id=category_id)
         price=request.POST.get("price")
+        # price1=request.POST.get("offer1")
+        # offer_price=request.POST.get("offer")
         quantity=request.POST.get("quantity")
         vendor_id=Vendor.objects.get(admin=request.user.id)
         image_file =request.POST.get('image64data')
@@ -78,16 +85,27 @@ def add_product_save(request):
         ext = format.split('/')[-1]
 
         data = ContentFile(base64.b64decode(imgstr),name='temp.' + ext)
+        # ab = 100
+        # pr = price
+        # price = int(price)
+        # offer_price = int(offer_price)
+        # print(price1,'hai')
+        # if offer_price == 1 :
+        #     new_amount = price
+        # else:
+        #     amount = int(price * offer_price)/100
+        #     new_amount = price - amount
 
 
-        try:
-            product=Product(product_name=product_name,category=category_name,price=price,quantity=quantity,vendor_id=vendor_id,product_image = data)
-            product.save()
-            messages.success(request,"Successfully Added Product")
-            return HttpResponseRedirect(reverse("add_product"))
-        except:
-            messages.error(request,"Failed to Add Product")
-            return HttpResponseRedirect(reverse("add_product"))
+
+        # try:
+        product=Product(product_name=product_name,category=category_name,price=price,quantity=quantity,vendor_id=vendor_id,product_image = data)
+        product.save()
+        messages.success(request,"Successfully Added Product")
+        return HttpResponseRedirect(reverse("add_product"))
+        # except:
+        #     messages.error(request,"Failed to Add Product")
+        #     return HttpResponseRedirect(reverse("add_product"))
 
 
 def edit_product(request,product_id):
@@ -158,14 +176,33 @@ def add_offer_save(request):
     else:
         offer_name=request.POST.get("offer_name")
         product_id=request.POST.get("product_name")
+        offer_type = request.POST.get("offer_type")
         product_name=Product.objects.get(id=product_id)
         vendor = Vendor.objects.get(admin=request.user.id)
+        price2=product_name.price
+        print(price2)
+        ab = 100
+        # pr = price
+        price2 = int(price2)
+        offer_name = int(offer_name)
+        if offer_type == 'Price Offer':
+            new_amount = price2 - offer_name
+        else:    
+            if offer_name == 1 :
+                new_amount = price2
+            else:
+                amount = int(price2 * offer_name)/100
+                new_amount = price2 - amount
+                print(new_amount)
 
         check_exist = Offer.objects.filter(product=product_name, vendor_id=vendor).exists()
         if check_exist:
             offer = Offer.objects.get(product=product_name,vendor_id=vendor)
             offer.offer = offer_name
             offer.save()
+            product_name.price1=price2
+            product_name.price=new_amount
+            product_name.save()
             messages.success(request,"Successfully Added Offer")
             return HttpResponseRedirect(reverse("add_offer"))
 
@@ -173,6 +210,9 @@ def add_offer_save(request):
 
             offer = Offer(offer=offer_name,product=product_name,vendor_id=vendor)
             offer.save()
+            product_name.price1=price2
+            product_name.price=new_amount
+            product_name.save()
             messages.success(request,"Successfully Added Offer")
             return HttpResponseRedirect(reverse("add_offer"))
 
@@ -191,8 +231,25 @@ def edit_offer_save(request):
         offer_id = request.POST.get("offer_id")
         offer_name = request.POST.get('offer_name')
         product = request.POST.get('product_name')
+        offer_type = request.POST.get('offer_type')
+        product_name1=Product.objects.get(id=product)
         vendor_id = Vendor.objects.get(admin=request.user.id)
 
+        price2=product_name1.price1
+        print(price2)
+        # ab = 100
+        # pr = price
+        price2 = int(price2)
+        offer_name = int(offer_name)
+        if offer_type == 'Price Offer':
+            new_amount = price2 - offer_name
+        else:
+            if offer_name == 1 :
+                new_amount = price2
+            else:
+                amount = int(price2 * offer_name)/100
+                new_amount = price2 - amount
+                print(new_amount)
 
         value = Offer.objects.get(id = offer_id)  
 
@@ -201,22 +258,172 @@ def edit_offer_save(request):
         product1 = Product.objects.get(id = product)
         value.product = product1
         value.save()
+        product_name1.price1=price2
+        product_name1.price=new_amount
+        product_name1.save()
         messages.success(request,"Successfully Updated Offer")
         return HttpResponseRedirect(reverse("edit_offer",kwargs={"offer_id":offer_id}))
-
 
 
 def delete_offer(request,offer_id):
 
     offer = Offer.objects.get(id = offer_id)
+    product1 = offer.product.id
+    product_obj = Product.objects.get(id=product1)
+    product_obj.price = product_obj.price1
+    product_obj.price1 = 0
+    product_obj.save()
+    print(product1)
     offer.delete()
     return redirect("manage_offer")
+
+def manage_category_offer(request):
+
+    vendor = Vendor.objects.get(admin=request.user.id)
+    # product = Product.objects.get(id = )
+    # category = Category.objects.get(category_name = )
+    offer = Offer.objects.filter(vendor_id=vendor)
+    return render(request, "vendor_template/manage_category_offer_template.html",{"offers":offer})
+
+
+
+def add_category_offer(request):
+
+    vendor = Vendor.objects.get(admin=request.user.id)
+    category_obj = Category.objects.all()
+    return render(request, "vendor_template/add_category_offer_template.html",{"categories":category_obj})
+
+
+def add_category_offer_save(request):
+
+    if request.method!="POST":
+        return HttpResponse("method not allowed")
+    else:
+        offer_name=request.POST.get("offer_name")
+        category_id=request.POST.get("category_name")
+        offer_type = request.POST.get("offer_type")
+        vendor = Vendor.objects.get(admin=request.user.id)
+        category_name=Category.objects.get(id=category_id)
+        product = Product.objects.filter(vendor_id=vendor,category=category_name)
+        for products in product:
+            price2 = products.price
+            if offer_type == 'Price Offer':
+                price2 = int(price2)
+                offer_name = int(offer_name)
+                new_amount = price2 - offer_name
+            else: 
+                if products.price1 == 0:
+                    print(products)
+                    price2 = products.price
+                    price2 = int(price2)
+                    offer_name = int(offer_name)
+                    amount = int(price2 * offer_name)/100
+                    new_amount = price2 - amount
+                    print(new_amount)
+                else:
+                    price2 = products.price1
+                    print(products)
+                    price2 = int(price2)
+                    offer_name = int(offer_name)
+                    amount = int(price2 * offer_name)/100
+                    new_amount = price2 - amount
+                    print(new_amount)
+
+            check_exist = Offer.objects.filter(product=products, vendor_id=vendor).exists()
+            if check_exist:
+                offer = Offer.objects.get(product=products,vendor_id=vendor)
+                offer.offer = offer_name
+                offer.save()
+                products.price1 = price2
+                products.price=new_amount
+                products.save()
+            else:
+
+                offer = Offer(offer=offer_name,product=products,vendor_id=vendor)
+                offer.save()
+                products.price1=price2
+                products.price=new_amount
+                products.save()
+        messages.success(request,"Successfully Added Offer")
+        return HttpResponseRedirect(reverse("add_category_offer"))
+
+
+def edit_category_offer(request,offer_id):
+
+    offer = Offer.objects.get(id = offer_id)
+    category_obj = Category.objects.all()
+    return render(request,"vendor_template/edit_category_offer_template.html",{"offer" : offer ,"id": offer_id,"categories" : category_obj})
+
+
+
+def edit_category_offer_save(request):
+    if request.method!="POST":
+        return HttpResponse("method not allowed")
+    else:
+        offer_id = request.POST.get("offer_id")
+        offer_name=request.POST.get("offer_name")
+        category_id=request.POST.get("category_name")
+        offer_type = request.POST.get("offer_type")
+        vendor = Vendor.objects.get(admin=request.user.id)
+        category_name=Category.objects.get(id=category_id)
+        product = Product.objects.filter(vendor_id=vendor,category=category_name)
+        for products in product:
+            price2 = products.price
+            if offer_type == 'Price Offer':
+                price2 = int(price2)
+                offer_name = int(offer_name)
+                new_amount = price2 - offer_name
+            else:
+                if products.price1 == 0:
+                    price2 = products.price
+                    print(products)
+                    price2 = int(price2)
+                    offer_name = int(offer_name)
+                    amount = int(price2 * offer_name)/100
+                    new_amount = price2 - amount
+                    print(new_amount)
+                else:
+                    price2 = products.price1
+                    print(products)
+                    price2 = int(price2)
+                    offer_name = int(offer_name)
+                    amount = int(price2 * offer_name)/100
+                    new_amount = price2 - amount
+                    print(new_amount)
+
+            value = Offer.objects.get(id = offer_id)
+            value.offer = offer_name
+            value.vendor_id = vendor
+            value.product.category = category_name
+            value.save()
+            products.price1=price2
+            products.price=new_amount
+            products.save()
+        messages.success(request,"Successfully Added Offer")
+        return HttpResponseRedirect(reverse("add_category_offer"))        
+
+
+
+def delete_category_offer(request,offer_id):
+
+    offer = Offer.objects.get(id = offer_id)
+    category1 = offer.product.category.id
+    category_obj = Product.objects.filter(category=category1)
+    for category_objs in category_obj:
+        category_objs.price = category_objs.price1
+        category_objs.price1 = 0
+        category_objs.save()
+    offer.delete()
+    print(category_obj,'hai')
+    
+    return redirect("manage_category_offer")
 
 
 
 def manage_vendor_order(request):
-    
-    orders = OrderDetails.objects.all()
+    admin = request.user.id
+    vendor = Vendor.objects.get(admin=admin)
+    orders = OrderDetails.objects.filter(vendor_id = vendor)
     return render(request,"vendor_template/vendor_status_template.html",{"orders":orders})
 
 

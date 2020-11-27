@@ -29,7 +29,14 @@
                                     <img src="{{ product.imageURL }}" alt="news image" class="thumbnail" >
                                     <div class="ab-info-con">
                                         <a href="/product/ {{ product.id }}"> <h4>{{ product.product_name }}</h4></a>
-                                        <p class="price">${{ product.price }}</p>
+                                        {% if product.price >= product.price1 %}
+                                            <p class="price">${{ product.price }}</p>
+                                        {% else %}
+                                        <div class="row " style="padding-left: 150px;">
+                                            <p class="price ">${{ product.price }}</p>
+                                            <del class="price pt-3" style="padding-left: 10px;">${{ product.price1 }}</del>
+                                        </div>
+                                        {% endif %}
                                         <button data-product="{{ product.id }}" onclick="add_cart()" data-action="add" href="" class="read-more scroll btn btn-danger update-cart">Add to Cart </button>
                                     </div>
                         </div>

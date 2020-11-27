@@ -20,9 +20,17 @@ Edit Offer
                           {% csrf_token %}
                         <div class="card-body">
                           <div class="form-group">
-                            <label>Offer Percentage </label>
+                            <label>Offer Type</label>
+                            <select class="form-control" name="offer_type">
+                                    <option>Price Offer</option>
+                                    <option>Percentage Offer</option>
+
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label>Offer </label>
                             <input type="hidden" name="offer_id" value="{{ offer.id }}">
-                            <input type="text" class="form-control" name="offer_name" value="{{ offer.offer }}" placeholder="Enter Offer Percentage">
+                            <input type="text" class="form-control" name="offer_name" value="{{ offer.offer }}" placeholder="Enter Offer">
                           </div>
                           <div class="form-group">
                             <label>Product Name</label>

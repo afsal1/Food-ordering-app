@@ -1,6 +1,6 @@
 {% extends 'vendor_template/base_template.html' %}
 {% block page_title %}
-Manage Offer
+Manage Category Offer
 {% endblock page_title %}
 {% block main_content %}
 
@@ -9,8 +9,7 @@ Manage Offer
         <div class="container-fluid">
           <div class="row">
             <div class="col-4 pb-5">
-              <a href="{% url 'add_offer' %}" class="btn btn-outline-primary ">+Add Offer</a></td>
-              <!-- <a href="{% url 'add_category_offer' %}" class="btn btn-outline-primary ">+Add Category Offer</a></td> -->
+              <a href="{% url 'add_category_offer' %}" class="btn btn-outline-primary ">+Add Category Offer</a></td>
             </div>
           </div>
             <div class="row">
@@ -34,17 +33,17 @@ Manage Offer
                       <table class="table table-hover text-nowrap">
                         <thead>
                           <tr>
-                            <th>Product Name</th>
+                            <th>Category Name</th>
                             <th>Offer Percentage</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for offer in offers %}
                           <tr>
-                            <td>{{ offer.product.product_name }}</td>
+                            <td>{{ offer.product.category.category_name }}</td>
                             <td>{{ offer.offer }}</td>
-                            <td><a href="/edit_offer/{{ offer.id }}" class="btn btn-outline-info ">Edit</a>
-                              <a class="confirm-delete btn btn-outline-danger" href="/delete_offer/{{ offer.id }}" >Delete</a>
+                            <td><a href="/edit_category_offer/{{ offer.id }}" class="btn btn-outline-info ">Edit</a>
+                              <a class="confirm-delete btn btn-outline-danger" href="/delete_category_offer/{{ offer.id }}" >Delete</a>
                               {% block custom_js %}
                               <script>
                                   $(document).on('click', '.confirm-delete', function(){

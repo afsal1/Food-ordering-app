@@ -96,7 +96,11 @@
                 {% endfor %}
     
                 <h5>Items: {{ order.get_cart_items }}</h5>
+                {% if change > 0 %}
+                <h5>Total: {{ change }}</h5>
+                {% else %}
                 <h5>Total: {{ order.get_cart_total|floatformat:2 }}</h5>
+                {% endif %}
     
                 
             </div>
@@ -109,7 +113,7 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AXKEraMJLNUKQA8qPJw2xN37wU9LAnrr-qLTJkpUW5b78TjIrdGRhOKgOz_lWSI1hATSh815laysc97g&currency=USD"></script>
 
 <script>
-    var total = '{{ order.get_cart_total }}'
+    var total = '{{ cart_total }}'
     // Render the PayPal button into #paypal-button-container
     paypal.Buttons({
 
@@ -149,7 +153,7 @@
     var options={
     "key":"rzp_test_pMt7Hdv04s334f" ,
     "amount":'{{ order.get_cart_total }}',
-    "currency":"INR",
+    "currency":"USD",
     "order_id":'{{ order_id }}',
 
     "handler": function (response){
@@ -252,7 +256,7 @@
         .then((data) => {
             console.log('Success:',data);
             alert('Transaction completed');
-            window.location.href="/select_baker"
+            window.location.href="/"
         })
     }
 </script>

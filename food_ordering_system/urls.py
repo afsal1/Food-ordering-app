@@ -49,7 +49,6 @@ urlpatterns = [
 
 
 #vendor views
-
     path('vendor_profile' ,vendor_views.vendor_profile, name="vendor_profile"),
     path('vendor_profile_save' ,vendor_views.vendor_profile_save, name="vendor_profile_save"),
     path('show_vendor_login_page',vendor_views.show_vendor_login_page, name="show_vendor_login_page"),
@@ -72,12 +71,19 @@ urlpatterns = [
     path('edit_offer/<str:offer_id>' ,vendor_views.edit_offer, name="edit_offer"),
     path('edit_offer_save' ,vendor_views.edit_offer_save, name="edit_offer_save"),
     path('delete_offer/<str:offer_id>' ,vendor_views.delete_offer, name="delete_offer"),
+    path('manage_category_offer' ,vendor_views.manage_category_offer, name="manage_category_offer"),
+    path('add_category_offer' ,vendor_views.add_category_offer, name="add_category_offer"),
+    path('add_category_offer_save' ,vendor_views.add_category_offer_save, name="add_category_offer_save"),
+    path('edit_category_offer/<str:offer_id>' ,vendor_views.edit_category_offer, name="edit_category_offer"),
+    path('edit_category_offer_save' ,vendor_views.edit_category_offer_save, name="edit_category_offer_save"),
+    path('delete_category_offer/<str:offer_id>' ,vendor_views.delete_category_offer, name="delete_category_offer"),
+
 
 
 
 
 #user views
-
+    path('show_referal_id' ,user_views.show_referal_id, name="show_referal_id"),
     path('demo_template' ,user_views.demo_template, name="demo_template"),
     path('user_home' ,user_views.user_home, name="user_home"),
     path('' ,user_views.select_baker, name="select_baker"),

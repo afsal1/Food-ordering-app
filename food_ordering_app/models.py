@@ -41,7 +41,8 @@ class Vendor(models.Model):
 
 class Customer(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    status = models.IntegerField(default=0,null=True,blank=True)
+    status = models.CharField(max_length = 200,null=True,blank=True)
+    refered_person = models.CharField(max_length = 200,null=True,blank=True)
     name = models.CharField(max_length = 200,null = True)
     email = models.CharField(max_length= 200, null = True)
     created_at=models.DateTimeField(auto_now_add=True)
@@ -64,6 +65,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     product_name = models.CharField(max_length = 200)
     price = models.IntegerField(default=0,null=True,blank=True)
+    price1 = models.IntegerField(default=0,null=True,blank=True)
+    offer_price = models.IntegerField(default=1)
     quantity = models.IntegerField(default=0,null=True,blank=True)
     product_image = models.ImageField(null = True, blank = True)
 
@@ -87,6 +90,7 @@ class OrderDetails(models.Model):
     complete = models.BooleanField(default=False, null=True,blank=False)
     transaction_id = models.CharField(max_length = 200, null = True )
     order_status = models.CharField(default = 'Pending',max_length = 200, null = True )
+    product_total = models.FloatField(default=0, null = True )
 
     @property
     def shipping(self):

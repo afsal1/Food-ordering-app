@@ -1,5 +1,5 @@
 document.getElementById('img-container').addEventListener('mouseover', function(){
-    imageZoom('featured')
+	imageZoom('featured')
     
 })
 

@@ -19,14 +19,29 @@
                     <th><h5>Items: <strong>{{ order.get_cart_items }}</strong></h5></th>
                     <th><h5>Total: <strong>{{ order.get_cart_total|floatformat:2 }}</strong></h5></th>
                     
+                    
                     <th><a style="float: right;margin: 5px;" class="btn btn-outline-danger" id="" href="/checkout">Checkout</a></th>
-
+                    
                     
                 </tr>
+              
+                   
+              
 
             </table>
+            <!-- <form class="form-inline" action="/checkout" method="POST">
+                {% csrf_token %}
 
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="offer_id" class="sr-only">Offer Id</label>
+                    <input type="text" class="form-control" name="offer_id" id="offer_id" placeholder="Offer Id">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Confirm </button>
+                </form> -->
+            
         </div>
+        
+
 
         <br>
 

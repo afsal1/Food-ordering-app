@@ -164,7 +164,7 @@ AUTH_USER_MODEL="food_ordering_app.CustomUser"
 
 SITE_ID=1
 
-LOGIN_REDIRECT_URL ="select_baker"
+LOGIN_REDIRECT_URL ="/"
 
 PAYTM_COMPANY_NAME = "Company Name"   # For representation purposes 
 PAYTM_INDUSTRY_TYPE_ID = "Retail"     # For staging environment

@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from food_ordering_app.models import Vendor, Product,Customer, Category, OrderDetails, ShippingAdress, CustomUser, OrderItem
+from food_ordering_app.models import Vendor, Product,Customer, Category, OrderDetails, ShippingAdress, CustomUser, OrderItem, Offer
 import json
 import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -155,6 +155,30 @@ def user_logout(request):
 
 
 
+def show_referal_id(request):
+    if request.user.is_authenticated:
+        admin1 = request.user.customer
+        order, created = OrderDetails.objects.get_or_create(customer = admin1, complete = False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+        order_count = OrderDetails.objects.filter(customer=admin1,complete=True)
+        oc = order_count.count()
+        item_count = items.count()
+        cust = Customer.objects.filter(refered_person = request.user.id).count()
+        reward = 0
+        reward = cust * 10
+    else:
+        reward = 0
+        customer = 0
+        items = []
+        order = {'get_cart_total':0,'get_cart_items':0,'shipping':False}
+        cartItems = order['get_cart_items']
+    context = {'customer':admin1,'reward':reward,'items':items,'order':order,'item_count':item_count,'oc':oc,"cartItems":cartItems}
+    return render(request, "user_template/offer_id_template.html",context)
+
+
+
+
 def register(request):
     if request.method == 'POST':  
 
@@ -163,6 +187,8 @@ def register(request):
         mobile = request.POST['mobile']
         password1 = request.POST.get('password')
         password2 = request.POST.get('password0')
+        referal = request.POST.get('referal_code')
+        offer_id = Checksum.__id_generator__()
         
 
         if password1==password2 :
@@ -176,12 +202,26 @@ def register(request):
                 messages.info(request, 'mobile number taken')
                 return render(request, 'user_template/register.html')
             else:    
-                user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
-                user.save()
-                print('User created')
-                responce = redirect('otp_verification')
-                responce.set_cookie('mobile', mobile)
-                return responce
+                if referal == "":
+
+                    user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
+                    user.customer.status=offer_id
+                    user.save()
+                    print('User created')
+                    responce = redirect('otp_verification')
+                    responce.set_cookie('mobile', mobile)
+                    return responce
+                else:
+                    if Customer.objects.filter(status = referal).exists():
+                        user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
+                        user.customer.status=offer_id
+                        cust = Customer.objects.get(status=referal)
+                        user.customer.refered_person=cust.admin.id
+                        user.save()
+                        responce = redirect('otp_verification')
+                        responce.set_cookie('mobile', mobile)
+                        return responce
+
                 # return redirect('user_login')
             # return render(request, 'user_template/register.html')
 
@@ -301,6 +341,8 @@ def cart(request):
         items = order.orderitem_set.all()
         
         cartItems = order.get_cart_items
+        
+        
 
 
     else:
@@ -325,15 +367,38 @@ def checkout(request):
         order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
+        item_count = items.count()
+        if admin.refered_person and OrderDetails.objects.filter(customer=admin, complete=True).count() < 1 :
+ 
+            ch = order.get_cart_total
+            print('ch',ch)
+            changes = (order.get_cart_total)*(90/100)
+            print("ff",changes)
+            change = round(changes)
+            print("change",change)
+           
+        else:
+            change = 0 
+        # offer_id = request.POST.get('offer_id')
+        # print(offer_id,'hai')
+    
+
 
         #razor pay
         client = razorpay.Client(auth=('rzp_test_pMt7Hdv04s334f', 'ptMwn6Dlg3ekQKMz40HYkAfK'))
         if request.user.is_authenticated:
-            total = int(order.get_cart_total*100)
+            if admin.refered_person and OrderDetails.objects.filter(customer=admin, complete=True).count() < 1 :
+                ch = order.get_cart_total
+                changes = (order.get_cart_total)*(90/100)
+                print("ff",changes)
+                totals = round(changes)
+                total = int((totals*100)/61.06)
+            else:    
+                total = int((order.get_cart_total*100)/74.0742)
         else:
-            total = int(order['get_cart_total']*100)
+            total = int(order['get_cart_total']*100/74.0742)
         order_amount =total
-        order_currency = 'INR'
+        order_currency = 'USD'
         admin = request.user.customer
         ship = ShippingAdress.objects.filter(customer=admin).distinct()
         if order_amount == 0:
@@ -350,7 +415,7 @@ def checkout(request):
         cartItems = order['get_cart_items']
 
 
-    return render(request, 'user_template/checkout_template.html',{'shipping':ship,"items":items,"order":order,"cartItems":cartItems,"order_id":order_id,"id":id})
+    return render(request, 'user_template/checkout_template.html',{'change':change,'shipping':ship,"items":items,"order":order,"cartItems":cartItems,"order_id":order_id,"id":id})
 
 
 class Getshipping(View):
@@ -445,11 +510,23 @@ def process_order(request):
     if request.user.is_authenticated:
         admin = request.user.customer
         order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
-        total = float(data['form']['total'])
+        if admin.refered_person and OrderDetails.objects.filter(customer=admin, complete=True).count() < 1 :
+            ch = order.get_cart_total
+            print('ch',ch)
+            changes = (order.get_cart_total)*(90/100)
+            print("ff",changes)
+            total = round(changes)
+        else:
+            total = float(data['form']['total'])
         order.transaction_id = transaction_id
 
-        if total == order.get_cart_total:
+        if admin.refered_person and OrderDetails.objects.filter(customer=admin, complete=True).count() < 1 :
             order.complete = True
+            order.product_total = total
+        else:
+            if float(total) == float(order.get_cart_total):
+                order.complete = True
+                order.product_total = total
 
         order.save()
 
@@ -473,9 +550,8 @@ def process_order(request):
 
 def product(request, product_id):
 
-    product = Product.objects.get(id=product_id)
     if request.user.is_authenticated:
-
+        product = Product.objects.get(id=product_id)
         admin = request.user.customer
         order, created = OrderDetails.objects.get_or_create(customer = admin, complete = False)
         items = order.orderitem_set.all()
@@ -541,6 +617,7 @@ def payment(request):
     cartItems = order.get_cart_items
     order_id = Checksum.__id_generator__()
     print(Checksum.__id_generator__(),'hai')
+    
     bill_amount = str(order.get_cart_total)
     data_dict = {
         'MID': settings.PAYTM_MERCHANT_ID,
