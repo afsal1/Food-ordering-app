@@ -179,7 +179,7 @@ def show_referal_id(request):
 
 
 
-def register(request):
+def register(request,vendor_id,referal):
     if request.method == 'POST':  
 
         username = request.POST.get('username')
@@ -187,7 +187,7 @@ def register(request):
         mobile = request.POST['mobile']
         password1 = request.POST.get('password')
         password2 = request.POST.get('password0')
-        referal = request.POST.get('referal_code')
+        # referal = request.POST.get('referal_code')
         offer_id = Checksum.__id_generator__()
         
 
@@ -206,6 +206,7 @@ def register(request):
 
                     user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
                     user.customer.status=offer_id
+                    print('tt',offer_id)
                     user.save()
                     print('User created')
                     responce = redirect('otp_verification')
@@ -215,8 +216,9 @@ def register(request):
                     if Customer.objects.filter(status = referal).exists():
                         user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
                         user.customer.status=offer_id
+                        print('pp',offer_id)
                         cust = Customer.objects.get(status=referal)
-                        user.customer.refered_person=cust.admin.id
+                        user.customer.refered_person=vendor_id
                         user.save()
                         responce = redirect('otp_verification')
                         responce.set_cookie('mobile', mobile)

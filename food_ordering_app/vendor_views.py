@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import user_passes_test
-from food_ordering_app.models import Vendor, Category, Product, Offer, CustomUser, OrderDetails
+from food_ordering_app.models import Vendor, Category, Product, Offer, CustomUser, OrderDetails, Customer
 from django.urls import reverse 
 import base64
 from PIL import Image
@@ -12,7 +12,8 @@ from base64 import decodestring
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.core.files.base import ContentFile
-
+import datetime
+from datetime import *
 
 
 def show_vendor_login_page(request):
@@ -43,7 +44,52 @@ def do_vendor_login(request):
         return render(request,"vendor_template/login_page.html")
 
 def vendor_home(request):
-    return render(request, "vendor_template/home_content.html")
+    vendor_obj=Vendor.objects.get(admin=request.user.id)
+    total_products=Product.objects.filter(vendor_id = vendor_obj).count()
+    total_offers=Offer.objects.filter(vendor_id = vendor_obj).count()
+    total_oders=OrderDetails.objects.filter(vendor_id = vendor_obj).count()
+
+    orders=OrderDetails.objects.filter(vendor_id = vendor_obj)
+    total = 0
+    for order in orders:
+        try:
+            order_total=order.get_cart_total
+        except:
+            order_total=0
+        total=total+order_total
+
+    # total count of customers
+    # customer_count=Customer.objects.all().count()
+    customer_count=Customer.objects.all().count()
+    
+
+    # chart
+    year = datetime.now().year
+    month = datetime.now().month
+    chart_order = OrderDetails.objects.filter(date_ordered__year = year,date_ordered__month = month,vendor_id = vendor_obj)
+    
+
+    chart_values = []
+    
+    for i in range(0,6):
+        chart_order = OrderDetails.objects.filter(date_ordered__year = year,date_ordered__month = month-5+i)
+        order_total = 0
+        for items in chart_order:
+            try:
+                order_total += round(items.get_cart_total,2)
+            except:
+                order_total += 0
+        chart_values.append(round(order_total,2)) 
+
+    # context = {
+    #     "products":products,
+    #     "order_count":order_count,
+    #     "total":total,
+    #     "customer_count":customer_count,
+    #     "chart_values":chart_values,
+    # }
+
+    return render(request, "vendor_template/home_content.html",{"total_products":total_products,"total_offers":total_offers,"total_oders":total_oders,"total":total,"chart_values":chart_values,"customer_count":customer_count})
 
 
 def logout_vendor(request):
