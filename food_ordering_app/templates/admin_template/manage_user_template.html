@@ -1,0 +1,80 @@
+{% extends 'admin_template/base_template.html' %}
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+              
+                  <h3 class="card-title">Customer Details</h3>
+                  <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                      <!-- drop down for filter -->
+                     
+                      <!-- Enddrop down for filter -->
+                      <div class="input-group-append">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                  <table class="table table-hover text-nowrap">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <!-- <th>Mobile</th> -->
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for customer in customers %}
+                      <tr>
+                        <td>{{ customer.id }}</td>
+                        <td>{{ customer.name }}  </td>
+                        <td>{{ customer.email }}</td>
+                        <!-- <td>{{ customer.user.last_name }}</td>
+                        <td>{{ customer.address }}</td> -->
+                        <td>
+                          {% if customer.admin.is_staff == 1 %}
+                          <a href="{% url 'unblock_user' customer.admin.id %}" class="btn btn-success">Unblock</a>
+                          {% else %}
+                          <a href="{% url 'block_user' customer.admin.id %}" class="btn btn-danger">Block</a>
+                          {% endif %}
+                      </td>
+                        
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+              
+              
+    </div>
+            <!-- /.card -->
+
+           
+    </div>
+  </section>
+
+
+<!-- 
+<script type="text/Javascript">
+  window.ondelete= function(){
+    var isValid =confirm('Are you sure Do you Want To Delete ?');
+    if (!isValid){
+      event.preventDefault();
+      // alert("It Wont delete");
+    }
+  }
+</script> -->
+
+{% endblock main_content %}

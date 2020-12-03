@@ -13,6 +13,8 @@ import razorpay
 from . import Checksum  
 from django.conf import settings
 from django.views.generic import View
+import datetime
+from datetime import *
 
 
 
@@ -134,8 +136,12 @@ def user_login(request):
         user = auth.authenticate(username = username, password = password)
 
         if user is not None:
-            login(request,user)
             print('login request')
+            if user.is_staff == 0:
+                login(request,user)
+            else:
+                messages.error(request,'Your account is blocked')
+                return HttpResponseRedirect("/")
             if user.user_type == "3":
                 return redirect('select_baker')
             else:
@@ -178,6 +184,56 @@ def show_referal_id(request):
 
 
 
+def signup(request):
+    if request.method == 'POST':  
+
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        mobile = request.POST['mobile']
+        password1 = request.POST.get('password')
+        password2 = request.POST.get('password0')
+        # referal = request.POST.get('referal_code')
+        offer_id = Checksum.__id_generator__()
+        
+
+        if password1==password2 :
+            if CustomUser.objects.filter(username=username).exists():
+                messages.info(request, 'Username taken')
+                return render(request, 'user_template/signup.html')
+            elif CustomUser.objects.filter(email=email).exists():
+                messages.info(request, 'email taken')
+                return render(request, 'user_template/signup.html')
+            elif CustomUser.objects.filter(last_name=mobile).exists():
+                messages.info(request, 'mobile number taken')
+                return render(request, 'user_template/signup.html')
+            else:    
+              
+
+                user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
+                user.customer.status=offer_id
+                user.customer.name = username
+                user.customer.email = email
+                print('tt',offer_id)
+                user.save()
+                print('User created')
+                responce = redirect('otp_verification')
+                responce.set_cookie('mobile', mobile)
+                return responce
+            
+              
+
+                
+        else:
+            messages.info(request, 'password not matching')       
+            return render(request, 'user_template/signup.html')
+       
+
+    else:
+        return render(request, 'user_template/signup.html')
+
+
+
+
 
 def register(request,vendor_id,referal):
     if request.method == 'POST':  
@@ -206,6 +262,8 @@ def register(request,vendor_id,referal):
 
                     user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
                     user.customer.status=offer_id
+                    user.customer.name = username
+                    user.customer.email = email
                     print('tt',offer_id)
                     user.save()
                     print('User created')
@@ -216,6 +274,8 @@ def register(request,vendor_id,referal):
                     if Customer.objects.filter(status = referal).exists():
                         user = CustomUser.objects.create_user(username = username, password = password1, email = email,first_name = password2,last_name = mobile,user_type=3)
                         user.customer.status=offer_id
+                        user.customer.name = username
+                        user.customer.email = email
                         print('pp',offer_id)
                         cust = Customer.objects.get(status=referal)
                         user.customer.refered_person=vendor_id
@@ -244,6 +304,25 @@ def user_home(request):
 
 def select_baker(request):
     vendor=Vendor.objects.all()
+
+    today = date.today()
+    DAY = today.day
+    print('dadada',DAY)
+    offer = Offer.objects.all()
+    print('blablabla',offer)
+    print(today)
+    for offers in offer:
+        if offers.expiry_date <= today:
+            print('lala',offers)
+            print('HAI')
+            product_id = offers.product.id
+            product = Product.objects.get(id=product_id)
+            normal_price = product.price1
+            product.price = normal_price
+            product.price1 = 0
+            offers.offer = 0
+            product.save()
+            offers.delete()
     if request.user.is_authenticated:
         admin1 = request.user.customer
         order, created = OrderDetails.objects.get_or_create(customer = admin1, complete = False)
@@ -286,7 +365,7 @@ def store(request,vendor_id):
         login_user = request.user
         login_name = request.user.username
         login_email = request.user.email
-        user = Customer.objects.filter( admin = login_user, name = login_name, email = login_email)
+        user , created = Customer.objects.get_or_create( admin = login_user, name = login_name, email = login_email)
         print(login_user)
         print(login_name)
         print(login_email)

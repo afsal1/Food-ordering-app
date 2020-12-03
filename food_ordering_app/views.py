@@ -34,8 +34,8 @@ def do_login(request):
         return render(request,"templates/login_page.html")
 
 
-def admin_home(request):
-    return render(request, "admin_template/home_content.html")
+# def admin_home(request):
+#     return render(request, "admin_template/home_content.html")
 
 
 def logout_user(request):

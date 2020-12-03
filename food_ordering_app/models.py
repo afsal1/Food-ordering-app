@@ -147,6 +147,7 @@ class Offer(models.Model):
     vendor_id = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     offer = models.CharField(max_length = 200)
+    expiry_date = models.DateTimeField(null=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
     objects=models.Manager()

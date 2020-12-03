@@ -3,13 +3,65 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse 
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
-from food_ordering_app.models import Vendor, CustomUser, Category
+from food_ordering_app.models import Vendor, CustomUser,OrderDetails, Category, Customer, OrderItem
 import base64
 from PIL import Image
 from base64 import decodestring
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.core.files.base import ContentFile
+import datetime
+from datetime import *
+
+
+
+def admin_home(request):
+    total_vendor = Vendor.objects.all().count()
+    total_customers=Customer.objects.all().count()
+    total_oders=OrderDetails.objects.all().count()
+
+    orders=OrderDetails.objects.all()
+    total = 0
+    for order in orders:
+        try:
+            order_total=order.get_cart_total
+        except:
+            order_total=0
+        total = total + order_total
+
+    # total count of customers
+    customer_count=Customer.objects.all().count()
+    
+
+    # chart
+    year = datetime.now().year
+    month = datetime.now().month
+    chart_order = OrderDetails.objects.filter(date_ordered__year = year,date_ordered__month = month)
+    
+
+    chart_values = []
+    
+    for i in range(0,6):
+        chart_order = OrderDetails.objects.filter(date_ordered__year = year,date_ordered__month = month-5+i)
+        order_total = 0
+        for items in chart_order:
+            try:
+                order_total += round(items.get_cart_total,2)
+            except:
+                order_total += 0
+        chart_values.append(round(order_total,2)) 
+
+    context = {
+        "total_customers":total_customers,
+        "total_vendor":total_vendor,
+        "total_oders":total_oders,
+        "total":total,
+        "chart_values":chart_values,
+   
+    }
+
+    return render(request, "admin_template/home_content.html",context)
+
 
 
 
@@ -167,7 +219,20 @@ def delete_category(request,category_id):
 
 
 def order_details(request):
-    return render(request, "admin_template/order_details_template.html")
+    order=OrderDetails.objects.all()
+    items =[]
+    for i in order:
+        details=OrderItem.objects.all()
+        for j in details:
+            items.append(j)
+
+    context ={
+        "items":items,
+        "order":order,
+       
+
+    }
+    return render(request, "admin_template/order_details_template.html",context)
 
 def user_details(request):
     return render(request, "admin_template/user_details_template.html")
@@ -199,3 +264,40 @@ def admin_profile_save(request):
         except:
             messages.error(request,"Failed to Update Profile")
             return HttpResponseRedirect(reverse("admin_profile"))
+
+
+def manage_customers(request):
+    customer = Customer.objects.all()
+    context = {
+        "customers":customer,
+        }
+    return render(request,"admin_template/manage_user_template.html",context)
+
+
+def block_user(request,user_id):
+    users = CustomUser.objects.get(id=user_id)
+    users.is_staff = 1
+    users.save()
+    return redirect("manage_customers")
+
+def unblock_user(request,user_id):
+    users = CustomUser.objects.get(id=user_id)
+    users.is_staff = 0
+    users.save()
+    return redirect("manage_customers")
+
+
+def block_admin(request,user_id):
+    users = CustomUser.objects.get(id=user_id)
+    users.is_staff = 1
+    users.save()
+    return redirect("manage_vendor")
+
+def unblock_admin(request,user_id):
+    users = CustomUser.objects.get(id=user_id)
+    users.is_staff = 0
+    users.save()
+    return redirect("manage_vendor")
+
+
+

@@ -24,12 +24,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('show_login_page',views.show_login_page, name="show_login_page"),
     path('do_login',views.do_login, name="do_login"),
-    path('admin_home' ,views.admin_home, name="admin_home"),
     path('logout_user' ,views.logout_user, name="logout_user"),
     path('accounts/' ,include('allauth.urls')),
 
 #admin Views 
 
+    path('admin_home' ,admin_views.admin_home, name="admin_home"),
     path('admin_profile' ,admin_views.admin_profile, name="admin_profile"),
     path('admin_profile_save' ,admin_views.admin_profile_save, name="admin_profile_save"),
     path('add_vendor' ,admin_views.add_vendor, name="add_vendor"),
@@ -46,6 +46,12 @@ urlpatterns = [
     path('edit_vendor/<str:vendor_id>' ,admin_views.edit_vendor, name="edit_vendor"),
     path('edit_vendor_save' ,admin_views.edit_vendor_save, name="edit_vendor_save"),
     path('delete_vendor/<vendor_id>' ,admin_views.delete_vendor, name="delete_vendor"),
+    path('manage_customers' ,admin_views.manage_customers, name="manage_customers"),
+    path('unblock_user/<str:user_id>' ,admin_views.unblock_user, name="unblock_user"),
+    path('block_user/<str:user_id>' ,admin_views.block_user, name="block_user"),
+    path('block_admin/<str:user_id>' ,admin_views.block_admin, name="block_admin"),
+    path('unblock_admin/<str:user_id>' ,admin_views.unblock_admin, name="unblock_admin"),
+
 
 
 #vendor views
@@ -96,6 +102,7 @@ urlpatterns = [
     path('product/<str:product_id>',user_views.product, name="product"),
     path('user_login',user_views.user_login, name="user_login"),
     path('register/<int:vendor_id>/<str:referal>',user_views.register, name="register"),
+    path('signup',user_views.signup, name="signup"),
     path('logout',user_views.logout, name="logout"),
     path('mobile_verification',user_views.mobile_verification, name="mobile_verification"),
     path('otp_verification',user_views.otp_verification, name="otp_verification"),

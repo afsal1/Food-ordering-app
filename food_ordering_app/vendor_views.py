@@ -27,12 +27,16 @@ def do_vendor_login(request):
         user = auth.authenticate(username=username,password=password)
         print(user)
         if user is not None:
-            login(request,user)
+            if user.is_staff == 0:
+                login(request,user)
+            else:
+                messages.error(request,'Your account is blocked')
+                return redirect("show_vendor_login_page")
             if user.user_type == "2":
                 return redirect("vendor_home")
-        else:
-            messages.error(request,"Inavalid login details")
-            return HttpResponseRedirect("show_vendor_login_page")
+            else:
+                messages.error(request,"Inavalid login details")
+                return HttpResponseRedirect("show_vendor_login_page")
                 # return redirect("show_vendor_login_page")
         # except:
         #     messages.error(request,"Inavalid login details")
@@ -46,7 +50,7 @@ def do_vendor_login(request):
 def vendor_home(request):
     vendor_obj=Vendor.objects.get(admin=request.user.id)
     total_products=Product.objects.filter(vendor_id = vendor_obj).count()
-    total_offers=Offer.objects.filter(vendor_id = vendor_obj).count()
+    # total_offers=Offer.objects.filter(vendor_id = vendor_obj).count()
     total_oders=OrderDetails.objects.filter(vendor_id = vendor_obj).count()
 
     orders=OrderDetails.objects.filter(vendor_id = vendor_obj)
@@ -56,7 +60,7 @@ def vendor_home(request):
             order_total=order.get_cart_total
         except:
             order_total=0
-        total=total+order_total
+        total = total + order_total
 
     # total count of customers
     # customer_count=Customer.objects.all().count()
@@ -72,7 +76,7 @@ def vendor_home(request):
     chart_values = []
     
     for i in range(0,6):
-        chart_order = OrderDetails.objects.filter(date_ordered__year = year,date_ordered__month = month-5+i)
+        chart_order = OrderDetails.objects.filter(date_ordered__year = year,date_ordered__month = month-5+i,vendor_id = vendor_obj)
         order_total = 0
         for items in chart_order:
             try:
@@ -86,10 +90,10 @@ def vendor_home(request):
     #     "order_count":order_count,
     #     "total":total,
     #     "customer_count":customer_count,
-    #     "chart_values":chart_values,
+    #     
     # }
 
-    return render(request, "vendor_template/home_content.html",{"total_products":total_products,"total_offers":total_offers,"total_oders":total_oders,"total":total,"chart_values":chart_values,"customer_count":customer_count})
+    return render(request, "vendor_template/home_content.html",{"total_products":total_products,"total_oders":total_oders,"total":total,"chart_values":chart_values,"customer_count":customer_count})
 
 
 def logout_vendor(request):
@@ -223,6 +227,7 @@ def add_offer_save(request):
         offer_name=request.POST.get("offer_name")
         product_id=request.POST.get("product_name")
         offer_type = request.POST.get("offer_type")
+        offer_date = request.POST.get("expiry_date")
         product_name=Product.objects.get(id=product_id)
         vendor = Vendor.objects.get(admin=request.user.id)
         price2=product_name.price
@@ -245,6 +250,7 @@ def add_offer_save(request):
         if check_exist:
             offer = Offer.objects.get(product=product_name,vendor_id=vendor)
             offer.offer = offer_name
+            expiry_date=offer_date
             offer.save()
             product_name.price1=price2
             product_name.price=new_amount
@@ -255,6 +261,7 @@ def add_offer_save(request):
         else:
 
             offer = Offer(offer=offer_name,product=product_name,vendor_id=vendor)
+            offer.expiry_date=offer_date
             offer.save()
             product_name.price1=price2
             product_name.price=new_amount
@@ -348,6 +355,7 @@ def add_category_offer_save(request):
         offer_name=request.POST.get("offer_name")
         category_id=request.POST.get("category_name")
         offer_type = request.POST.get("offer_type")
+        offer_date = request.POST.get("expiry_date")
         vendor = Vendor.objects.get(admin=request.user.id)
         category_name=Category.objects.get(id=category_id)
         product = Product.objects.filter(vendor_id=vendor,category=category_name)
@@ -377,7 +385,7 @@ def add_category_offer_save(request):
 
             check_exist = Offer.objects.filter(product=products, vendor_id=vendor).exists()
             if check_exist:
-                offer = Offer.objects.get(product=products,vendor_id=vendor)
+                offer = Offer.objects.get(product=products,vendor_id=vendor,expiry_date=offer_date)
                 offer.offer = offer_name
                 offer.save()
                 products.price1 = price2
@@ -385,7 +393,7 @@ def add_category_offer_save(request):
                 products.save()
             else:
 
-                offer = Offer(offer=offer_name,product=products,vendor_id=vendor)
+                offer = Offer(offer=offer_name,product=products,vendor_id=vendor,expiry_date=offer_date)
                 offer.save()
                 products.price1=price2
                 products.price=new_amount
