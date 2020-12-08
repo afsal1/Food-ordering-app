@@ -99,7 +99,7 @@ def add_vendor_save(request):
 
         data = ContentFile(base64.b64decode(imgstr),name='temp.' + ext)
         #try:
-        user = CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=2,is_staff = 3)
+        user = CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=2,is_staff = 1)
         user.vendor.shop_name=shop_name
         user.vendor.place=place
         user.vendor.color_picker=color_picker

@@ -306,7 +306,7 @@ def select_baker(request):
     if request.user.is_superuser:
         admin=request.user
         return redirect('admin_home')
-    elif request.user.is_staff == 3:
+    elif request.user.is_staff == 1:
         return redirect('vendor_home')
     elif request.user.is_authenticated:
         admin1 = request.user.customer

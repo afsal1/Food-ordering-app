@@ -109,14 +109,14 @@ WSGI_APPLICATION = 'food_ordering_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite11',
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'food_ordering_system',
-        'USER' : 'root',
-        'PASSWORD' : '12345',
-        'HOST' : 'localhost',
-        'PORT' : '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite4',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME' : 'food_ordering_system',
+        # 'USER' : 'root',
+        # 'PASSWORD' : '12345',
+        # 'HOST' : 'localhost',
+        # 'PORT' : '3306',
     }
 }
 
