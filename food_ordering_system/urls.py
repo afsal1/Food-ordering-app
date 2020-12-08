@@ -22,7 +22,7 @@ from food_ordering_system import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('show_login_page',views.show_login_page, name="show_login_page"),
+    # path('show_login_page',views.show_login_page, name="show_login_page"),
     path('do_login',views.do_login, name="do_login"),
     path('logout_user' ,views.logout_user, name="logout_user"),
     path('accounts/' ,include('allauth.urls')),
@@ -49,15 +49,15 @@ urlpatterns = [
     path('manage_customers' ,admin_views.manage_customers, name="manage_customers"),
     path('unblock_user/<str:user_id>' ,admin_views.unblock_user, name="unblock_user"),
     path('block_user/<str:user_id>' ,admin_views.block_user, name="block_user"),
-    path('block_admin/<str:user_id>' ,admin_views.block_admin, name="block_admin"),
-    path('unblock_admin/<str:user_id>' ,admin_views.unblock_admin, name="unblock_admin"),
+    # path('block_admin/<str:user_id>' ,admin_views.block_admin, name="block_admin"),
+    # path('unblock_admin/<str:user_id>' ,admin_views.unblock_admin, name="unblock_admin"),
 
 
 
 #vendor views
     path('vendor_profile' ,vendor_views.vendor_profile, name="vendor_profile"),
     path('vendor_profile_save' ,vendor_views.vendor_profile_save, name="vendor_profile_save"),
-    path('show_vendor_login_page',vendor_views.show_vendor_login_page, name="show_vendor_login_page"),
+    # path('show_vendor_login_page',vendor_views.show_vendor_login_page, name="show_vendor_login_page"),
     path('do_vendor_login',vendor_views.do_vendor_login, name="do_vendor_login"),
     path('vendor_home' ,vendor_views.vendor_home, name="vendor_home"),
     path('logout_vendor' ,vendor_views.logout_vendor, name="logout_vendor"),

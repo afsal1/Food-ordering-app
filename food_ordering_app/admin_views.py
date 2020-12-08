@@ -12,9 +12,13 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 import datetime
 from datetime import *
+from django.contrib.auth.decorators import user_passes_test
+from django.views.decorators.cache import cache_control
 
 
+@user_passes_test(lambda u: u.is_superuser,login_url='do_login')
 
+@cache_control(no_cache=True, must_revalidate=True,no_store=True)
 def admin_home(request):
     total_vendor = Vendor.objects.all().count()
     total_customers=Customer.objects.all().count()
@@ -95,7 +99,7 @@ def add_vendor_save(request):
 
         data = ContentFile(base64.b64decode(imgstr),name='temp.' + ext)
         #try:
-        user = CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=2)
+        user = CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=2,is_staff = 3)
         user.vendor.shop_name=shop_name
         user.vendor.place=place
         user.vendor.color_picker=color_picker
@@ -287,17 +291,17 @@ def unblock_user(request,user_id):
     return redirect("manage_customers")
 
 
-def block_admin(request,user_id):
-    users = CustomUser.objects.get(id=user_id)
-    users.is_staff = 1
-    users.save()
-    return redirect("manage_vendor")
+# def block_admin(request,user_id):
+#     users = CustomUser.objects.get(id=user_id)
+#     users.is_staff = 1
+#     users.save()
+#     return redirect("manage_vendor")
 
-def unblock_admin(request,user_id):
-    users = CustomUser.objects.get(id=user_id)
-    users.is_staff = 0
-    users.save()
-    return redirect("manage_vendor")
+# def unblock_admin(request,user_id):
+#     users = CustomUser.objects.get(id=user_id)
+#     users.is_staff = 0
+#     users.save()
+#     return redirect("manage_vendor")
 
 
 

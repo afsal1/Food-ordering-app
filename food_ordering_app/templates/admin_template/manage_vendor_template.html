@@ -59,13 +59,7 @@ Manage vendor
                                 </script>
                               {% endblock custom_js %}
 
-                              <td>
-                                {% if vendor.admin.is_staff == 1 %}
-                                <a href="{% url 'unblock_admin' vendor.admin.id %}" class="btn btn-success">Unblock</a>
-                                {% else %}
-                                <a href="{% url 'block_admin' vendor.admin.id %}" class="btn btn-danger">Block</a>
-                                {% endif %}
-                            </td>
+                             
                             
                              </tr>
                           {% endfor %}

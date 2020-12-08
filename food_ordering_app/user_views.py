@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from food_ordering_app.models import Vendor, Product,Customer, Category, OrderDetails, ShippingAdress, CustomUser, OrderItem, Offer
 import json
-import datetime
 from django.views.decorators.csrf import csrf_exempt
 import requests
 import razorpay
@@ -15,6 +14,8 @@ from django.conf import settings
 from django.views.generic import View
 import datetime
 from datetime import *
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_control
 
 
 
@@ -123,11 +124,11 @@ def otp_verification(request):
         return redirect('mobile_verification')
 
 
-
+@cache_control(no_cache=True, must_revalidate=True,no_store=True)
 def user_login(request):
-
-
-    if request.method == 'POST':
+    if request.user.is_authenticated:
+        return redirect("select_baker")
+    elif request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         print(password)
@@ -154,7 +155,7 @@ def user_login(request):
     else:
         return render(request,'user_template/user_login.html')
 
-
+# @login_required(login_url="/select_baker")
 def user_logout(request):
     logout(request)
     return redirect("select_baker")
@@ -213,9 +214,7 @@ def signup(request):
                 user.customer.status=offer_id
                 user.customer.name = username
                 user.customer.email = email
-                print('tt',offer_id)
-                user.save()
-                print('User created')
+                user.customer.save()
                 responce = redirect('otp_verification')
                 responce.set_cookie('mobile', mobile)
                 return responce
@@ -301,33 +300,37 @@ def register(request,vendor_id,referal):
 def user_home(request):
     return render(request, "user_template/home_content.html")
 
-
 def select_baker(request):
     vendor=Vendor.objects.all()
 
-    today = date.today()
-    DAY = today.day
-    print('dadada',DAY)
-    offer = Offer.objects.all()
-    print('blablabla',offer)
-    print(today)
-    for offers in offer:
-        if offers.expiry_date <= today:
-            print('lala',offers)
-            print('HAI')
-            product_id = offers.product.id
-            product = Product.objects.get(id=product_id)
-            normal_price = product.price1
-            product.price = normal_price
-            product.price1 = 0
-            offers.offer = 0
-            product.save()
-            offers.delete()
-    if request.user.is_authenticated:
+    if request.user.is_superuser:
+        admin=request.user
+        return redirect('admin_home')
+    elif request.user.is_staff == 3:
+        return redirect('vendor_home')
+    elif request.user.is_authenticated:
         admin1 = request.user.customer
         order, created = OrderDetails.objects.get_or_create(customer = admin1, complete = False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
+        today = date.today()
+        DAY = today.day
+        print('dadada',DAY)
+        offer = Offer.objects.all()
+        print('blablabla',offer)
+        print(today)
+        for offers in offer:
+            if offers.expiry_date == today:
+                print('lala',offers)
+                print('HAI')
+                product_id = offers.product.id
+                product = Product.objects.get(id=product_id)
+                normal_price = product.price1
+                product.price = normal_price
+                product.price1 = 0
+                offers.offer = 0
+                product.save()
+                offers.delete()
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0,'shipping':False}
@@ -365,7 +368,7 @@ def store(request,vendor_id):
         login_user = request.user
         login_name = request.user.username
         login_email = request.user.email
-        user , created = Customer.objects.get_or_create( admin = login_user, name = login_name, email = login_email)
+        user  = Customer.objects.filter( admin = login_user, name = login_name, email = login_email)
         print(login_user)
         print(login_name)
         print(login_email)
@@ -473,11 +476,11 @@ def checkout(request):
                 changes = (order.get_cart_total)*(90/100)
                 print("ff",changes)
                 totals = round(changes)
-                total = int((totals*100)/61.06)
+                total = int((totals*100))
             else:    
-                total = int((order.get_cart_total*100)/74.0742)
+                total = int((order.get_cart_total*100))
         else:
-            total = int(order['get_cart_total']*100/74.0742)
+            total = int(order['get_cart_total']*100)
         order_amount =total
         order_currency = 'USD'
         admin = request.user.customer
@@ -584,28 +587,25 @@ def update_item(request):
 
 @csrf_exempt
 def process_order(request):
-    transaction_id = datetime.datetime.now().timestamp()
+    transaction_id=datetime.now().timestamp()
     data = json.loads(request.body) 
-
 
     if request.user.is_authenticated:
         admin = request.user.customer
         order , created =OrderDetails.objects.get_or_create( customer = admin, complete  = False)
         if admin.refered_person and OrderDetails.objects.filter(customer=admin, complete=True).count() < 1 :
             ch = order.get_cart_total
-            print('ch',ch)
             changes = (order.get_cart_total)*(90/100)
-            print("ff",changes)
             total = round(changes)
         else:
-            total = float(data['form']['total'])
+            total = str(data['form']['total'])
         order.transaction_id = transaction_id
 
         if admin.refered_person and OrderDetails.objects.filter(customer=admin, complete=True).count() < 1 :
             order.complete = True
             order.product_total = total
         else:
-            if float(total) == float(order.get_cart_total):
+            if str(total) == str(order.get_cart_total):
                 order.complete = True
                 order.product_total = total
 
